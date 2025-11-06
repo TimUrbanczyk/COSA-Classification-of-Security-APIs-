@@ -12,4 +12,10 @@
         <toolWindow factoryClass="com.github.timurbanczyk.cosaclassificationofsecurityapis.toolWindow.MyToolWindowFactory" id="MyToolWindow"/>
         <postStartupActivity implementation="com.github.timurbanczyk.cosaclassificationofsecurityapis.startup.MyProjectActivity" />
     </extensions>
+
+    <actions>
+        <action id="com.test.luis.HelloAction" class="main" text="Hello" description="Says Hello">
+            <add-to-group group-id="ToolsMenu" anchor="last"/>
+        </action>
+    </actions>
 </idea-plugin>
