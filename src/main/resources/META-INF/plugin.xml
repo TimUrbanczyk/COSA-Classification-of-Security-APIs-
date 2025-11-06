@@ -9,15 +9,11 @@
     <resource-bundle>messages.MyBundle</resource-bundle>
 
     <extensions defaultExtensionNs="com.intellij">
-        <toolWindow
-                factoryClass="MyToolWindowFactory"
-                id="test"
-                anchor="right"
-                icon="/icons/PanelIcon.png"/>
 
+        <toolWindow factoryClass="com.github.timurbanczyk.cosaclassificationofsecurityapis.toolWindow.MyToolWindowFactory" id="MyToolWindow"/>
+        <toolWindow factoryClass="myToolWindowFactory" id="test" anchor="right" icon="icons/PanelIcon.png" canCloseContents="false"/>
         <postStartupActivity implementation="com.github.timurbanczyk.cosaclassificationofsecurityapis.startup.MyProjectActivity" />
     </extensions>
-
 
     <actions>
         <action id="com.test.luis.HelloAction" class="main" text="Hello" description="Says Hello">
