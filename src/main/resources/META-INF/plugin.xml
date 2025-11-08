@@ -11,7 +11,7 @@
     <extensions defaultExtensionNs="com.intellij">
 
         <toolWindow factoryClass="com.github.timurbanczyk.cosaclassificationofsecurityapis.toolWindow.MyToolWindowFactory" id="MyToolWindow"/>
-        <toolWindow factoryClass="myToolWindowFactory" id="COSA" anchor="right" icon="icons/PanelIcon.png" canCloseContents="false"/>
+        <toolWindow factoryClass="ToolWindow" id="COSA" anchor="right" icon="icons/PanelIcon.png" canCloseContents="false"/>
         <postStartupActivity implementation="com.github.timurbanczyk.cosaclassificationofsecurityapis.startup.MyProjectActivity" />
     </extensions>
 
