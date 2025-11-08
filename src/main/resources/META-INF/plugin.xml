@@ -11,13 +11,9 @@
     <extensions defaultExtensionNs="com.intellij">
 
         <toolWindow factoryClass="com.github.timurbanczyk.cosaclassificationofsecurityapis.toolWindow.MyToolWindowFactory" id="MyToolWindow"/>
-        <toolWindow factoryClass="myToolWindowFactory" id="test" anchor="right" icon="icons/PanelIcon.png" canCloseContents="false"/>
+        <toolWindow factoryClass="myToolWindowFactory" id="COSA" anchor="right" icon="icons/PanelIcon.png" canCloseContents="false"/>
         <postStartupActivity implementation="com.github.timurbanczyk.cosaclassificationofsecurityapis.startup.MyProjectActivity" />
     </extensions>
 
-    <actions>
-        <action id="com.test.luis.HelloAction" class="main" text="Hello" description="Says Hello">
-            <add-to-group group-id="ToolsMenu" anchor="last"/>
-        </action>
-    </actions>
+
 </idea-plugin>
