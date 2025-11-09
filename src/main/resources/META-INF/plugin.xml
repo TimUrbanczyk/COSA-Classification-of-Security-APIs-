@@ -2,7 +2,7 @@
 <idea-plugin>
     <id>com.github.timurbanczyk.cosaclassificationofsecurityapis</id>
     <name>COSA-Classification-of-Security-APIs-</name>
-    <vendor>timurbanczyk</vendor>
+    <vendor>COSA</vendor>
 
     <depends>com.intellij.modules.platform</depends>
 
@@ -10,9 +10,8 @@
 
     <extensions defaultExtensionNs="com.intellij">
 
-        <toolWindow factoryClass="com.github.timurbanczyk.cosaclassificationofsecurityapis.toolWindow.MyToolWindowFactory" id="MyToolWindow"/>
-        <toolWindow factoryClass="ToolWindow" id="COSA" anchor="right" icon="icons/PanelIcon.png" canCloseContents="false"/>
-        <postStartupActivity implementation="com.github.timurbanczyk.cosaclassificationofsecurityapis.startup.MyProjectActivity" />
+        <toolWindow factoryClass="com.github.timurbanczyk.cosaclassificationofsecurityapis.toolWindow.ToolWindow" id="MyToolWindow"/>
+        <toolWindow factoryClass="gui.ToolWindow" id="COSA" anchor="right" icon="icons/PanelIcon.png" canCloseContents="false"/>
     </extensions>
 
 
