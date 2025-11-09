@@ -42,9 +42,6 @@ public class SecurityClass {
             stringBuilder.append("<br><h2>").append(securityClass.name).append(":</h2><br>");
             for(int i = 0; i < securityClass.getApis().size(); i++){
                 stringBuilder.append(securityClass.getApis().get(i)).append(", ");
-                if((i % 5) == 0){
-                    stringBuilder.append("\n");
-                }
             }
         }
         String footer = "</p></div></html>";
