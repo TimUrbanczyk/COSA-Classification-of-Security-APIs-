@@ -5,14 +5,23 @@
     <vendor>COSA</vendor>
 
     <depends>com.intellij.modules.platform</depends>
+    <depends>com.intellij.modules.java</depends>
 
     <resource-bundle>messages.MyBundle</resource-bundle>
 
     <extensions defaultExtensionNs="com.intellij">
-
-        <toolWindow factoryClass="com.github.timurbanczyk.cosaclassificationofsecurityapis.toolWindow.ToolWindow" id="MyToolWindow"/>
-        <toolWindow factoryClass="gui.ToolWindow" id="COSA" anchor="right" icon="icons/PanelIcon.png" canCloseContents="false"/>
+        <toolWindow
+                factoryClass="gui.ToolWindow"
+                id="COSA"
+                anchor="right"
+                icon="icons/PanelIcon.png"
+                canCloseContents="false"/>
     </extensions>
 
+    <actions>
+        <action id="actions.CreateCommentAction" class="actions.CreateCommentAction" text="Mark">
+            <add-to-group group-id="ToolsMenu" anchor="last"/>
+        </action>
+    </actions>
 
 </idea-plugin>
