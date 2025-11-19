@@ -1,5 +1,6 @@
 package gui;
 
+import com.intellij.openapi.editor.Editor;
 import service.CommentGeneratorService;
 import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.project.Project;
@@ -20,6 +21,7 @@ public class ToolWindow implements ToolWindowFactory, DumbAware {
     private final FileReader fileReader = new FileReader();
     private final SecurityAPILoader securityAPILoader = new SecurityAPILoader();
     private final CommentGeneratorService commentGeneratorService = new CommentGeneratorService();
+    private final PopUp popUp = new PopUp();
 
     @Override
     public void createToolWindowContent(Project project, com.intellij.openapi.wm.ToolWindow toolwindow) {
@@ -27,6 +29,13 @@ public class ToolWindow implements ToolWindowFactory, DumbAware {
         JButton buttonRead = new JButton("Read Current File");
         JButton buttonShowSecurityClasses = new JButton("Show security classes");
         JButton buttonMarkSecurityAPIS = new JButton("Locate & Mark security apis");
+        JButton buttonClassifySecurityAPI = new JButton("Classify current selected API");
+
+        buttonClassifySecurityAPI.addActionListener(e->{
+
+            Editor editor = FileEditorManager.getInstance(project).getSelectedTextEditor();
+            popUp.showPopup(editor);
+        });
 
         buttonMarkSecurityAPIS.addActionListener(e->{
             for(SecurityClass securityClass: SecurityClass.getSecurityClasses()){
@@ -66,6 +75,7 @@ public class ToolWindow implements ToolWindowFactory, DumbAware {
         panel.add(buttonRead);
         panel.add(buttonShowSecurityClasses);
         panel.add(buttonMarkSecurityAPIS);
+        panel.add(buttonClassifySecurityAPI);
         ContentFactory contentFactory = ContentFactory.getInstance();
         Content content = contentFactory.createContent(panel, "", false);
         toolwindow.getContentManager().addContent(content);
