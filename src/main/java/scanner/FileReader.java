@@ -1,6 +1,9 @@
 package scanner;
 
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.psi.PsiManager;
+import com.intellij.openapi.project.Project;
+
 import java.io.IOException;
 
 public class FileReader {
@@ -11,4 +14,5 @@ public class FileReader {
         }
         return new String(file.contentsToByteArray(), file.getCharset());
     }
+
 }

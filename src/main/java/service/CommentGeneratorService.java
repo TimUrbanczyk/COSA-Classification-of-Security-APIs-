@@ -1,11 +1,9 @@
 package service;
 
-import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.command.WriteCommandAction;
-import org.jetbrains.annotations.NotNull;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.*;
+import com.intellij.psi.util.PsiTreeUtil;
 
 public class CommentGeneratorService  {
 
@@ -13,21 +11,26 @@ public class CommentGeneratorService  {
             String securityApi,
             String commentString,
             Project project,
-            PsiFile psiFile){
+            PsiFile psiFile) {
 
         if (psiFile == null) return;
 
-        PsiElementFactory factory = JavaPsiFacade.getElementFactory(project);
-        PsiComment comment = factory.createCommentFromText("//[" + commentString +"]", null);
-
         WriteCommandAction.runWriteCommandAction(project, () -> {
-            PsiElement desiredElement = findChildByText(psiFile,securityApi);
-            if (desiredElement == null){
+            PsiElement desiredElement = findChildByText(psiFile, securityApi);
+            if (desiredElement == null) {
                 return;
             }
-            psiFile.addAfter(comment, desiredElement);
+
+            // find complete statement (important!)
+            PsiStatement statement = PsiTreeUtil.getParentOfType(desiredElement, PsiStatement.class);
+            if (statement == null) {
+                return;
+            }
+
+            addCommentAfter(statement, commentString, project);
         });
     }
+
 
     private PsiElement findChildByText(PsiElement parent, String text) {
         if (text.equals(parent.getText())) {
@@ -40,4 +43,14 @@ public class CommentGeneratorService  {
         return null;
     }
 
+
+    private void addCommentAfter(PsiElement element, String comment, Project project) {
+
+        PsiElement parent = element.getParent();
+
+        PsiComment commentNode = PsiElementFactory.getInstance(project)
+                .createCommentFromText("//[" + comment + "]", null);
+
+        parent.addAfter(commentNode, element);
+    }
 }
