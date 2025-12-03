@@ -1,30 +1,32 @@
 package gui;
 
 import com.intellij.openapi.editor.Editor;
+import scanner.ImportFetcher;
+import scanner.ImportLocator;
 import service.CommentGeneratorService;
 import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.wm.ToolWindowFactory;
-import com.intellij.psi.PsiManager;
 import com.intellij.ui.content.Content;
 import com.intellij.ui.content.ContentFactory;
-import data.SecurityAPILoader;
-import data.SecurityClass;
 import scanner.FileReader;
+
 import javax.swing.*;
 import java.io.IOException;
 
 public class ToolWindow implements ToolWindowFactory, DumbAware {
 
     private final FileReader fileReader = new FileReader();
-    private final SecurityAPILoader securityAPILoader = new SecurityAPILoader();
     private final CommentGeneratorService commentGeneratorService = new CommentGeneratorService();
     private final PopUp popUp = new PopUp();
 
+
+
     @Override
     public void createToolWindowContent(Project project, com.intellij.openapi.wm.ToolWindow toolwindow) {
+
         JPanel panel = new JPanel();
         JButton buttonRead = new JButton("Read Current File");
         JButton buttonShowSecurityClasses = new JButton("Show security classes");
@@ -32,31 +34,21 @@ public class ToolWindow implements ToolWindowFactory, DumbAware {
         JButton buttonClassifySecurityAPI = new JButton("Classify current selected API");
 
         buttonClassifySecurityAPI.addActionListener(e->{
-
             Editor editor = FileEditorManager.getInstance(project).getSelectedTextEditor();
             popUp.showPopup(editor);
         });
 
+
+
         buttonMarkSecurityAPIS.addActionListener(e->{
-            for(SecurityClass securityClass: SecurityClass.getSecurityClasses()){
-                String sc = securityClass.getName();
-                for(String securityAPIName : securityClass.getApis()){
-                    commentGeneratorService.markSecurityAPI(
-                            securityAPIName,
-                            sc,
-                            project,
-                            PsiManager.getInstance(project).findFile(getCurrentFile(project)));
-                }
-            }
+
 
         });
 
-        buttonShowSecurityClasses.addActionListener( e-> {
-            JOptionPane.showMessageDialog(null,
-                    SecurityClass.ListToString(),
-                    "SecurityClassList",
-                    JOptionPane.INFORMATION_MESSAGE) ;
+        buttonShowSecurityClasses.addActionListener(e -> {
+            System.out.println(ImportLocator.locateImports(project));
         });
+
 
 
         buttonRead.addActionListener(e -> {

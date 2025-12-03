@@ -1,17 +1,13 @@
 package gui;
 
-import com.intellij.openapi.application.WriteAction;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.SelectionModel;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.popup.JBPopup;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
-import com.intellij.openapi.vfs.VirtualFile;
-import data.SecurityClass;
 
 import javax.swing.*;
 import java.awt.*;
-import java.nio.charset.StandardCharsets;
 
 public class PopUp {
 
@@ -37,15 +33,7 @@ public class PopUp {
 
         final JBPopup[] popupRef = new JBPopup[1];
 
-        for (SecurityClass securityClass : SecurityClass.getSecurityClasses()) {
-            JButton btn = new JButton(securityClass.getName());
-            btn.setAlignmentX(Component.LEFT_ALIGNMENT);
-            btn.addActionListener(e -> {
-                addToJson(project, securityClass.getName(), selectedText);
-                if (popupRef[0] != null) popupRef[0].cancel();
-            });
-            popUpPanel.add(btn);
-        }
+
 
         popUpPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
