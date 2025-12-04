@@ -1,0 +1,44 @@
+{
+  "name": "Java Standard Library",
+  "version": "1.8",
+  "namespace": "java.net",
+  "categories": [],
+  "children": [
+    {
+      "namespace": "URLEncoder",
+      "categories": ["Data_Sanitization"],
+      "children": []
+    },
+    {
+      "namespace": "URLDecoder",
+      "categories": ["Data_Sanitization"],
+      "children": []
+    }
+  ],
+  "namespace": "java.util",
+  "categories": [],
+  "children": [
+    {
+      "namespace": "concurrent",
+      "categories": [],
+      "children": [
+        {
+          "namespace": "locks",
+          "categories": [],
+          "children": [
+            {
+              "namespace": "ReentrantLock",
+              "categories": ["State_Synchronization"],
+              "children": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "namespace": "Base64",
+      "categories": ["Steganography"],
+      "children": []
+    }
+  ]
+}

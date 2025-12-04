@@ -1,7 +1,10 @@
 package gui;
 
+import com.d.X.C.C.d.M;
 import com.intellij.openapi.editor.Editor;
-import scanner.ImportFetcher;
+import data.MappingLoader;
+import data.MappingNode;
+import kotlinx.html.S;
 import scanner.ImportLocator;
 import service.CommentGeneratorService;
 import com.intellij.openapi.project.DumbAware;
@@ -12,24 +15,24 @@ import com.intellij.openapi.wm.ToolWindowFactory;
 import com.intellij.ui.content.Content;
 import com.intellij.ui.content.ContentFactory;
 import scanner.FileReader;
-
 import javax.swing.*;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ToolWindow implements ToolWindowFactory, DumbAware {
 
     private final FileReader fileReader = new FileReader();
     private final CommentGeneratorService commentGeneratorService = new CommentGeneratorService();
     private final PopUp popUp = new PopUp();
-
-
+    private final MappingLoader mappingLoader = new MappingLoader();
+    private final List<MappingNode> allMappingNodes = mappingLoader.loadAllMappings();
 
     @Override
     public void createToolWindowContent(Project project, com.intellij.openapi.wm.ToolWindow toolwindow) {
 
         JPanel panel = new JPanel();
         JButton buttonRead = new JButton("Read Current File");
-        JButton buttonShowSecurityClasses = new JButton("Show security classes");
         JButton buttonMarkSecurityAPIS = new JButton("Locate & Mark security apis");
         JButton buttonClassifySecurityAPI = new JButton("Classify current selected API");
 
@@ -39,16 +42,18 @@ public class ToolWindow implements ToolWindowFactory, DumbAware {
         });
 
 
-
         buttonMarkSecurityAPIS.addActionListener(e->{
 
+            List<List<String>> allNamespaces = new ArrayList<>();
+            for(MappingNode mappingNode : allMappingNodes){
+                allNamespaces.add(mappingLoader.getNamespaces(mappingNode, new ArrayList<>()));
+
+            }
+
+            System.out.println(allNamespaces.toString());
+
 
         });
-
-        buttonShowSecurityClasses.addActionListener(e -> {
-            System.out.println(ImportLocator.locateImports(project));
-        });
-
 
 
         buttonRead.addActionListener(e -> {
@@ -65,7 +70,6 @@ public class ToolWindow implements ToolWindowFactory, DumbAware {
         });
 
         panel.add(buttonRead);
-        panel.add(buttonShowSecurityClasses);
         panel.add(buttonMarkSecurityAPIS);
         panel.add(buttonClassifySecurityAPI);
         ContentFactory contentFactory = ContentFactory.getInstance();

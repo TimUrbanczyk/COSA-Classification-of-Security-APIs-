@@ -4,7 +4,6 @@ import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.*;
 import org.yaml.snakeyaml.util.Tuple;
-
 import java.util.*;
 
 public class ImportLocator {
@@ -46,8 +45,6 @@ public class ImportLocator {
                 linesMap.put(psiFile.getName(),map);
                 map.put(importQualifiedName, lines);
             }
-
-
         }
         return linesMap;
     }
