@@ -9,7 +9,6 @@ import com.intellij.psi.PsiManager;
 import com.intellij.psi.search.FilenameIndex;
 import com.intellij.psi.search.GlobalSearchScope;
 import org.yaml.snakeyaml.util.Tuple;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
