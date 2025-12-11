@@ -1,11 +1,11 @@
 package gui;
 
-import com.d.X.C.C.d.M;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.psi.PsiElement;
 import data.MappingLoader;
 import data.MappingNode;
-import kotlinx.html.S;
-import scanner.ImportLocator;
+import psi.PsiUtils;
+import scanner.MappingLocator;
 import service.CommentGeneratorService;
 import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.project.Project;
@@ -16,7 +16,6 @@ import com.intellij.ui.content.Content;
 import com.intellij.ui.content.ContentFactory;
 import scanner.FileReader;
 import javax.swing.*;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,7 +25,8 @@ public class ToolWindow implements ToolWindowFactory, DumbAware {
     private final CommentGeneratorService commentGeneratorService = new CommentGeneratorService();
     private final PopUp popUp = new PopUp();
     private final MappingLoader mappingLoader = new MappingLoader();
-    private final List<MappingNode> allMappingNodes = mappingLoader.loadAllMappings();
+    private final List<MappingNode> allParendMappingNodes = mappingLoader.loadAllParentMappings();
+    private final MappingLocator mappingLocator = new MappingLocator();
 
     @Override
     public void createToolWindowContent(Project project, com.intellij.openapi.wm.ToolWindow toolwindow) {
@@ -44,29 +44,24 @@ public class ToolWindow implements ToolWindowFactory, DumbAware {
 
         buttonMarkSecurityAPIS.addActionListener(e->{
 
-            List<List<String>> allNamespaces = new ArrayList<>();
-            for(MappingNode mappingNode : allMappingNodes){
-                allNamespaces.add(mappingLoader.getNamespaces(mappingNode, new ArrayList<>()));
+            List<MappingNode> allMappingNodes = new ArrayList<>();
 
+            for(MappingNode mappingNode: allParendMappingNodes){
+                allMappingNodes.addAll(mappingLoader.getAllChildMappings(mappingNode, new ArrayList<>()));
             }
 
-            System.out.println(allNamespaces.toString());
+            PsiElement currentPsiElement = PsiUtils.getPsiFile(project,getCurrentFile(project));
+            for(MappingNode mappingNode : allMappingNodes){
+                List<Integer> occurences = mappingLocator.locateMapping(mappingNode,currentPsiElement);
+
+            }
 
 
         });
 
 
         buttonRead.addActionListener(e -> {
-            try{
-                String currentFileContent = fileReader.readFileAsString(getCurrentFile(project));
-                JOptionPane.showMessageDialog(
-                        null,
-                        currentFileContent,
-                        "IDK...TEST...FORNOW",
-                        JOptionPane.INFORMATION_MESSAGE);
-            } catch (IOException ex){
-                ex.printStackTrace();
-            }
+            PsiUtils.getPsiFile(project, getCurrentFile(project));
         });
 
         panel.add(buttonRead);

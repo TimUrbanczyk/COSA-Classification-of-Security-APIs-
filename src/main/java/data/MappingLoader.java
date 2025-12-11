@@ -11,7 +11,7 @@ public class MappingLoader {
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final String userHome = System.getProperty("user.home");
 
-    public List<MappingNode> loadAllMappings(){
+    public List<MappingNode> loadAllParentMappings(){
 
         List<MappingNode> allMappings = new ArrayList<>();
 
@@ -38,6 +38,20 @@ public class MappingLoader {
 
 
         return allMappings;
+    }
+
+    public List<MappingNode> getAllChildMappings(MappingNode mappingNode,ArrayList<MappingNode> children){
+        if(mappingNode.getChildren() == null || mappingNode.getChildren().isEmpty()){
+            return null;
+        }
+        children.add(mappingNode);
+
+        for(MappingNode childNode : mappingNode.getChildren()){
+            getAllChildMappings(childNode, children);
+        }
+
+        return children;
+
     }
 
     public List<String> getNamespaces(MappingNode fileRootNode, ArrayList<String> namespaces){
