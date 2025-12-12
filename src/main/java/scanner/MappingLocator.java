@@ -1,5 +1,7 @@
 package scanner;
 
+import SecurityClass.SecurityClass;
+import SecurityClass.SecurityclassUtils;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiDocumentManager;
@@ -21,10 +23,19 @@ public class MappingLocator {
         Document document = PsiDocumentManager.getInstance(psiFile.getProject()).getDocument(psiFile);
         if (document == null) return lineNumbers;
 
+        if(mappingNode.getCategories() != null && !mappingNode.getCategories().isEmpty()){
+            for(String categorie : mappingNode.getCategories()){
+                SecurityClass securityClass = new SecurityClass(categorie);
+                if(SecurityclassUtils.getSecurityClasses().contains(securityClass)){
+                    break;
+                }
+                SecurityclassUtils.addSecurityClass(securityClass);
+            }
+        }
         PsiTreeUtil.processElements(psiFile, element -> {
             String text = element.getText();
             String target = mappingNode.getNamespace();
-            if (text.contains(target)) {
+            if (text.toLowerCase().contains(target.toLowerCase())) {
                 TextRange range = element.getTextRange();
                 int line = document.getLineNumber(range.getStartOffset()) + 1;
                 if(!target.isEmpty()){

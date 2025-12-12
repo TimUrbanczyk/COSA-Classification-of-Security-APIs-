@@ -1,5 +1,6 @@
 package gui;
 
+import SecurityClass.SecurityclassUtils;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.psi.PsiElement;
 import data.MappingLoader;
@@ -36,17 +37,13 @@ public class ToolWindow implements ToolWindowFactory, DumbAware {
         JButton buttonMarkSecurityAPIS = new JButton("Locate & Mark security apis");
         JButton buttonClassifySecurityAPI = new JButton("Classify current selected API");
 
-        buttonClassifySecurityAPI.addActionListener(e->{
-            Editor editor = FileEditorManager.getInstance(project).getSelectedTextEditor();
-            popUp.showPopup(editor);
-        });
-
 
         buttonMarkSecurityAPIS.addActionListener(e->{
 
             List<MappingNode> allMappingNodes = new ArrayList<>();
 
             for(MappingNode mappingNode: allParendMappingNodes){
+                System.out.println(mappingLoader.getAllChildMappings(mappingNode,new ArrayList<>()).toString());
                 allMappingNodes.addAll(mappingLoader.getAllChildMappings(mappingNode, new ArrayList<>()));
             }
 
@@ -55,6 +52,8 @@ public class ToolWindow implements ToolWindowFactory, DumbAware {
                 List<Integer> occurences = mappingLocator.locateMapping(mappingNode,currentPsiElement);
 
             }
+
+            System.out.println(SecurityclassUtils.getSecurityClasses().toString());
 
 
         });

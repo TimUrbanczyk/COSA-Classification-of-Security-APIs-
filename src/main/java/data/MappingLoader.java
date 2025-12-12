@@ -40,18 +40,17 @@ public class MappingLoader {
         return allMappings;
     }
 
-    public List<MappingNode> getAllChildMappings(MappingNode mappingNode,ArrayList<MappingNode> children){
+    public List<MappingNode> getAllChildMappings(MappingNode mappingNode, ArrayList<MappingNode> children){
         if(mappingNode.getChildren() == null || mappingNode.getChildren().isEmpty()){
-            return null;
+            return children;
         }
-        children.add(mappingNode);
 
         for(MappingNode childNode : mappingNode.getChildren()){
+            children.add(childNode);
             getAllChildMappings(childNode, children);
         }
 
         return children;
-
     }
 
     public List<String> getNamespaces(MappingNode fileRootNode, ArrayList<String> namespaces){
