@@ -14,5 +14,4 @@ public class SecurityclassUtils {
         securityClasses.add(securityClass);
     }
 
-
 }

@@ -10,12 +10,15 @@ import com.intellij.psi.PsiFile;
 import com.intellij.psi.util.PsiTreeUtil;
 import data.MappingNode;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class MappingLocator {
 
     public List<Integer> locateMapping(MappingNode mappingNode, PsiElement fileAsPsiElement) {
         List<Integer> lineNumbers = new ArrayList<>();
+        Set<Integer> seenLines = new HashSet<>();
         PsiFile psiFile = fileAsPsiElement.getContainingFile();
 
         if (psiFile == null) return lineNumbers;
@@ -38,7 +41,12 @@ public class MappingLocator {
             if (text.toLowerCase().contains(target.toLowerCase())) {
                 TextRange range = element.getTextRange();
                 int line = document.getLineNumber(range.getStartOffset()) + 1;
+                if(seenLines.contains(line)){
+                    return false;
+                }
+                seenLines.add(line);
                 if(!target.isEmpty()){
+                    lineNumbers.add(line);
                     System.out.println("Found '" + target + "' at line " + line +"   " + mappingNode.getCategories() );
                 }
             }
