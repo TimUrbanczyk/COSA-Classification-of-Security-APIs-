@@ -47,7 +47,7 @@ public class MappingLocator {
                 seenLines.add(line);
                 if(!target.isEmpty()){
                     lineNumbers.add(line);
-                    System.out.println("Found '" + target + "' at line " + line +"   " + mappingNode.getCategories() );
+                    //System.out.println("Found '" + target + "' at line " + line +"   " + mappingNode.getCategories() );
                 }
             }
             return true;
