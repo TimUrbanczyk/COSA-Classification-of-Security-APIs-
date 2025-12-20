@@ -27,12 +27,9 @@ public class MappingLocator {
         if (document == null) return lineNumbers;
 
         if(mappingNode.getCategories() != null && !mappingNode.getCategories().isEmpty()){
-            for(String categorie : mappingNode.getCategories()){
-                SecurityClass securityClass = new SecurityClass(categorie);
-                if(SecurityclassUtils.getSecurityClasses().contains(securityClass)){
-                    break;
-                }
-                SecurityclassUtils.addSecurityClass(securityClass);
+            for(String category : mappingNode.getCategories()){
+                SecurityClass securityClass = new SecurityClass(category);
+
             }
         }
         PsiTreeUtil.processElements(psiFile, element -> {
@@ -47,7 +44,14 @@ public class MappingLocator {
                 seenLines.add(line);
                 if(!target.isEmpty()){
                     lineNumbers.add(line);
-                    //System.out.println("Found '" + target + "' at line " + line +"   " + mappingNode.getCategories() );
+                    for(String category : mappingNode.getCategories()) {
+                        SecurityClass securityClass = new SecurityClass(category);
+                        if (SecurityclassUtils.getSecurityClasses().contains(securityClass)) {
+                            continue;
+                        }
+                        SecurityclassUtils.addSecurityClass(securityClass);
+                    }
+                    System.out.println("Found '" + target + " in file " + psiFile.getName() + "at line " + line +"  " + mappingNode.getCategories() );
                 }
             }
             return true;

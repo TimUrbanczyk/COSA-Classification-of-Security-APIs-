@@ -58,18 +58,14 @@ public class ToolWindow implements ToolWindowFactory, DumbAware {
             model.setRowCount(0);
             for(SecurityClass securityClass : SecurityclassUtils.getSecurityClasses()){
 
-
                 model.addRow(new Object[]{
                         securityClass.getName(),
-                        "COMING SOON"
+                        getCurrentFile(project).getName()
                 });
             }
 
         });
 
-        buttonRead.addActionListener(e -> {
-            PsiUtils.getPsiFile(project, getCurrentFile(project));
-        });
 
         panel.add(buttonMarkSecurityAPIS);
         panel.add(buttonClassifySecurityAPI);
@@ -82,7 +78,7 @@ public class ToolWindow implements ToolWindowFactory, DumbAware {
         toolwindow.getContentManager().addContent(content);
     }
     private JTable createTable(List<SecurityClass> data){
-        String[] columns = {"Securityclass","Lines"};
+        String[] columns = {"Securityclass","Files"};
 
         DefaultTableModel model = new DefaultTableModel(columns,0){
             @Override
