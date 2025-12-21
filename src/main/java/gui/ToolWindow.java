@@ -20,6 +20,7 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class ToolWindow implements ToolWindowFactory, DumbAware {
@@ -36,7 +37,6 @@ public class ToolWindow implements ToolWindowFactory, DumbAware {
     public void createToolWindowContent(Project project, com.intellij.openapi.wm.ToolWindow toolwindow) {
 
         JPanel panel = new JPanel();
-        JButton buttonRead = new JButton("Read Current File");
         JButton buttonMarkSecurityAPIS = new JButton("Locate & Mark security apis");
         JButton buttonClassifySecurityAPI = new JButton("Classify current selected API");
         JTable tableSecurityClasses = createTable(SecurityclassUtils.getSecurityClasses());
@@ -45,13 +45,12 @@ public class ToolWindow implements ToolWindowFactory, DumbAware {
             List<MappingNode> allMappingNodes = new ArrayList<>();
 
             for(MappingNode mappingNode: allParendMappingNodes){
-                //System.out.println(mappingLoader.getAllChildMappings(mappingNode,new ArrayList<>()).toString());
                 allMappingNodes.addAll(mappingLoader.getAllChildMappings(mappingNode, new ArrayList<>()));
             }
 
             PsiElement currentPsiElement = PsiUtils.getPsiFile(project,getCurrentFile(project));
             for(MappingNode mappingNode : allMappingNodes){
-                List<Integer> occurences = mappingLocator.locateMapping(mappingNode,currentPsiElement);
+                 mappingLocator.locateMapping(mappingNode,currentPsiElement);
             }
 
             DefaultTableModel model = (DefaultTableModel) tableSecurityClasses.getModel();
@@ -60,7 +59,14 @@ public class ToolWindow implements ToolWindowFactory, DumbAware {
 
                 model.addRow(new Object[]{
                         securityClass.getName(),
-                        getCurrentFile(project).getName()
+                        Arrays.toString(
+                                securityClass.getOccurrences()
+                                .values()
+                                .stream()
+                                .flatMap(List::stream)
+                                .distinct()
+                                .mapToInt(Integer::intValue)
+                                .toArray())
                 });
             }
 
@@ -73,12 +79,11 @@ public class ToolWindow implements ToolWindowFactory, DumbAware {
         tableScrollPane.setPreferredSize(new Dimension(toolwindow.getComponent().getWidth(), toolwindow.getComponent().getHeight()));
         panel.add(tableScrollPane);
         ContentFactory contentFactory = ContentFactory.getInstance();
-        System.out.println(panel.getHeight()+" "+panel.getWidth());
         Content content = contentFactory.createContent(panel, "", false);
         toolwindow.getContentManager().addContent(content);
     }
     private JTable createTable(List<SecurityClass> data){
-        String[] columns = {"Securityclass","Files"};
+        String[] columns = {"Securityclass","Ocurrencess"};
 
         DefaultTableModel model = new DefaultTableModel(columns,0){
             @Override
