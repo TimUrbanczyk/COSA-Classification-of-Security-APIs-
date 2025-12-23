@@ -16,7 +16,6 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.wm.ToolWindowFactory;
 import com.intellij.ui.content.Content;
 import com.intellij.ui.content.ContentFactory;
-import service.CommentGeneratorService;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
@@ -26,7 +25,6 @@ import java.util.List;
 
 public class ToolWindow implements ToolWindowFactory, DumbAware {
 
-    private final CommentGeneratorService commentGeneratorService = new CommentGeneratorService();
     private final MappingLoader mappingLoader = new MappingLoader();
     private final List<MappingNode> allParendMappingNodes = mappingLoader.loadAllParentMappings();
     private final MappingLocator mappingLocator = new MappingLocator();
@@ -65,11 +63,7 @@ public class ToolWindow implements ToolWindowFactory, DumbAware {
                                 .mapToInt(Integer::intValue)
                                 .toArray())
                 });
-                commentGeneratorService.markSecurityAPI(
-                        securityClass.getName(),
-                        "Tesrffffffffffft",
-                        project,
-                        PsiUtils.getPsiFileFromVirtualFile(project,getCurrentFile(project)));
+
             }
 
 
