@@ -21,6 +21,7 @@ public class CommentGeneratorService  {
                 return;
             }
 
+
             // find complete statement (important!)
             PsiStatement statement = PsiTreeUtil.getParentOfType(desiredElement, PsiStatement.class);
             if (statement == null) {
@@ -38,19 +39,18 @@ public class CommentGeneratorService  {
         }
         for (PsiElement child : parent.getChildren()) {
             PsiElement result = findChildByText(child, text);
-            if (result != null) return result;
+            if (result != null){
+                return result;
+            }
         }
         return null;
     }
 
 
     private void addCommentAfter(PsiElement element, String comment, Project project) {
-
         PsiElement parent = element.getParent();
-
         PsiComment commentNode = PsiElementFactory.getInstance(project)
                 .createCommentFromText("//[" + comment + "]", null);
-
         parent.addAfter(commentNode, element);
     }
 }

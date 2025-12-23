@@ -6,6 +6,7 @@
 
     <depends>com.intellij.modules.platform</depends>
     <depends>com.intellij.modules.java</depends>
+    <depends>com.intellij.modules.lang</depends>
 
     <resource-bundle>messages.MyBundle</resource-bundle>
 
@@ -18,10 +19,18 @@
                 canCloseContents="false"/>
     </extensions>
 
+
     <actions>
         <action id="actions.CreateCommentAction" class="actions.CreateCommentAction" text="Mark">
             <add-to-group group-id="ToolsMenu" anchor="last"/>
         </action>
+        <action id="manualClassification"
+                class="gui.ShowMethodPopupAction"
+                text="Classify API"
+                description="Test if actions work at all">
+            <add-to-group group-id="EditorPopupMenu" anchor="first"/>
+        </action>
+
     </actions>
 
 </idea-plugin>

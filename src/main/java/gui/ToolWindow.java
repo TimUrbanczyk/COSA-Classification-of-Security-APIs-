@@ -16,6 +16,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.wm.ToolWindowFactory;
 import com.intellij.ui.content.Content;
 import com.intellij.ui.content.ContentFactory;
+import service.CommentGeneratorService;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
@@ -24,11 +25,8 @@ import java.util.Arrays;
 import java.util.List;
 
 public class ToolWindow implements ToolWindowFactory, DumbAware {
-    /*
-    private final FileReader fileReader = new FileReader();
+
     private final CommentGeneratorService commentGeneratorService = new CommentGeneratorService();
-    private final PopUp popUp = new PopUp();
-     */
     private final MappingLoader mappingLoader = new MappingLoader();
     private final List<MappingNode> allParendMappingNodes = mappingLoader.loadAllParentMappings();
     private final MappingLocator mappingLocator = new MappingLocator();
@@ -38,7 +36,6 @@ public class ToolWindow implements ToolWindowFactory, DumbAware {
 
         JPanel panel = new JPanel();
         JButton buttonMarkSecurityAPIS = new JButton("Locate & Mark security apis");
-        JButton buttonClassifySecurityAPI = new JButton("Classify current selected API");
         JTable tableSecurityClasses = createTable(SecurityclassUtils.getSecurityClasses());
 
         buttonMarkSecurityAPIS.addActionListener(e->{
@@ -68,13 +65,18 @@ public class ToolWindow implements ToolWindowFactory, DumbAware {
                                 .mapToInt(Integer::intValue)
                                 .toArray())
                 });
+                commentGeneratorService.markSecurityAPI(
+                        securityClass.getName(),
+                        "Tesrffffffffffft",
+                        project,
+                        PsiUtils.getPsiFileFromVirtualFile(project,getCurrentFile(project)));
             }
+
 
         });
 
 
         panel.add(buttonMarkSecurityAPIS);
-        panel.add(buttonClassifySecurityAPI);
         JScrollPane tableScrollPane = new JBScrollPane(tableSecurityClasses);
         tableScrollPane.setPreferredSize(new Dimension(toolwindow.getComponent().getWidth(), toolwindow.getComponent().getHeight()));
         panel.add(tableScrollPane);

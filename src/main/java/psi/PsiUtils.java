@@ -28,4 +28,18 @@ public class PsiUtils {
         }
         return psiFileAsPsiElement[0];
     }
+
+    public static PsiFile getPsiFileFromVirtualFile(Project project, VirtualFile virtualFile) {
+        if (project == null || virtualFile == null) {
+            throw new IllegalArgumentException("Project or VirtualFile is null");
+        }
+
+        PsiFile psiFile = PsiManager.getInstance(project).findFile(virtualFile);
+
+        if (psiFile == null) {
+            throw new NullPointerException("PsiFile does not exist for the given VirtualFile");
+        }
+
+        return psiFile;
+    }
 }

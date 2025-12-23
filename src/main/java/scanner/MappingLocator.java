@@ -21,15 +21,19 @@ public class MappingLocator {
         PsiFile psiFile = fileAsPsiElement.getContainingFile();
         if (psiFile == null) return lineNumbers;
 
-        PsiDocumentManager manager =
-                PsiDocumentManager.getInstance(psiFile.getProject());
+        PsiDocumentManager manager = PsiDocumentManager.getInstance(psiFile.getProject());
         Document document = manager.getDocument(psiFile);
-        if (document == null) return lineNumbers;
+
+        if (document == null){
+            return lineNumbers;
+        }
 
         manager.commitDocument(document);
 
         String target = mappingNode.getNamespace();
-        if (target == null || target.isEmpty()) return lineNumbers;
+        if (target == null || target.isEmpty()){
+            return lineNumbers;
+        }
 
         Pattern pattern = Pattern.compile(
                 "\\b" + Pattern.quote(target) + "\\b",
@@ -63,12 +67,10 @@ public class MappingLocator {
                         .findFirst();
 
                 if(existingSecurityClass.isPresent()){
-                    // Add line to existing SecurityClass
                     existingSecurityClass.get().occurrences
                             .computeIfAbsent(psiFile.getName(), k -> new ArrayList<>())
                             .add(line);
                 } else {
-                    // Create new SecurityClass
                     SecurityClass securityClass =
                             new SecurityClass(category, new HashMap<>());
 
@@ -79,13 +81,6 @@ public class MappingLocator {
                     SecurityclassUtils.addSecurityClass(securityClass);
                 }
             }
-
-            System.out.println(
-                    "Found " + target + " in file " +
-                            psiFile.getName() + " at line " + line + "  " +
-                            mappingNode.getCategories()
-            );
-
             return true;
         });
 
