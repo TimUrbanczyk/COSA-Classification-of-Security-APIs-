@@ -7,6 +7,7 @@ import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.table.JBTable;
 import data.MappingLoader;
 import data.MappingNode;
+import lombok.Getter;
 import psi.PsiUtils;
 import scanner.MappingLocator;
 import com.intellij.openapi.project.DumbAware;
@@ -19,8 +20,7 @@ import com.intellij.ui.content.ContentFactory;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.*;
 import java.util.List;
 
 public class ToolWindow implements ToolWindowFactory, DumbAware {
@@ -28,10 +28,15 @@ public class ToolWindow implements ToolWindowFactory, DumbAware {
     private final MappingLoader mappingLoader = new MappingLoader();
     private final List<MappingNode> allParendMappingNodes = mappingLoader.loadAllParentMappings();
     private final MappingLocator mappingLocator = new MappingLocator();
+    private ClassificationPopUp currentDialog;
+
+    @Getter
+    private static ToolWindow instance;
 
     @Override
     public void createToolWindowContent(Project project, com.intellij.openapi.wm.ToolWindow toolwindow) {
 
+        ToolWindow.instance = this;
         JPanel panel = new JPanel();
         JButton buttonMarkSecurityAPIS = new JButton("Locate & Mark security apis");
         JTable tableSecurityClasses = createTable(SecurityclassUtils.getSecurityClasses());
@@ -65,6 +70,9 @@ public class ToolWindow implements ToolWindowFactory, DumbAware {
                 });
 
             }
+            currentDialog.refresh();
+
+
 
 
         });
@@ -78,6 +86,15 @@ public class ToolWindow implements ToolWindowFactory, DumbAware {
         Content content = contentFactory.createContent(panel, "", false);
         toolwindow.getContentManager().addContent(content);
     }
+
+    public void setCurrentDialog(ClassificationPopUp dialog) {
+        this.currentDialog = dialog;
+        if (currentDialog != null) {
+            currentDialog.refresh();
+        }
+    }
+
+
     private JTable createTable(List<SecurityClass> data){
         String[] columns = {"Securityclass","Ocurrencess"};
 
