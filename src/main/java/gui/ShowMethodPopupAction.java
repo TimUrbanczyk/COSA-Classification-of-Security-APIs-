@@ -1,33 +1,21 @@
 package gui;
 
-
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.wm.ToolWindowManager;
+import com.intellij.openapi.ui.Messages;
 import org.jetbrains.annotations.NotNull;
-
-import javax.swing.*;
-import java.awt.*;
 
 public class ShowMethodPopupAction extends AnAction {
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
-        if(e.getProject() == null) {
-            return;
-        }
-
-        ClassificationPopUp dialog = new ClassificationPopUp();
-        ToolWindow toolWindow = ToolWindow.getInstance();
-        toolWindow.setCurrentDialog(dialog);
-
-        if(dialog.showAndGet()){
-            String text = dialog.getTextFieldValue();
-
-        }
-
+        String className = Messages.showInputDialog(
+                e.getProject(),
+                "Enter classification",
+                "Classify API - COSA",
+                Messages.getQuestionIcon()
+        );
     }
-
 
     @Override
     public void update(@NotNull AnActionEvent e) {

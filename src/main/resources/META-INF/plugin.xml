@@ -21,12 +21,16 @@
 
 
     <actions>
-        <action id="gui.manualClassification"
+        <action id="actions.CreateCommentAction" class="actions.CreateCommentAction" text="Mark">
+            <add-to-group group-id="ToolsMenu" anchor="last"/>
+        </action>
+        <action id="manualClassification"
                 class="gui.ShowMethodPopupAction"
-                text="Classify API- COSA"
-                description="Classify method call">
+                text="Classify API"
+                description="Test if actions work at all">
             <add-to-group group-id="EditorPopupMenu" anchor="first"/>
         </action>
+
     </actions>
 
 </idea-plugin>
