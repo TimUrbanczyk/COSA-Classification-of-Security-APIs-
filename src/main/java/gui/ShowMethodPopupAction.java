@@ -1,13 +1,26 @@
 package gui;
 
 
+import SecurityClass.SecurityClass;
+import SecurityClass.SecurityclassUtils;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.wm.ToolWindowManager;
+import com.intellij.openapi.editor.Document;
+import com.intellij.openapi.editor.Editor;
+import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiFile;
+import com.intellij.psi.PsiMethodCallExpression;
+import com.intellij.psi.PsiReferenceExpression;
+import com.intellij.psi.util.PsiTreeUtil;
 import org.jetbrains.annotations.NotNull;
-
 import javax.swing.*;
 import java.awt.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class ShowMethodPopupAction extends AnAction {
 
@@ -17,18 +30,60 @@ public class ShowMethodPopupAction extends AnAction {
             return;
         }
 
+
+        String methodQualifiedName = null;
+        int lineNumber = 0;
+        Editor editor = e.getData(com.intellij.openapi.actionSystem.CommonDataKeys.EDITOR);
+        PsiFile psiFile = e.getData(com.intellij.openapi.actionSystem.CommonDataKeys.PSI_FILE);
+        if(editor != null && psiFile != null) {
+            int offset = editor.getCaretModel().getOffset();
+            PsiElement elementAtCaret = psiFile.findElementAt(offset);
+            if(elementAtCaret != null) {
+                PsiMethodCallExpression methodCall = PsiTreeUtil.getParentOfType(elementAtCaret, PsiMethodCallExpression.class);
+                if(methodCall != null) {
+                    PsiReferenceExpression methodExpression = methodCall.getMethodExpression();
+                    methodQualifiedName = methodExpression.getText();
+                    Document document = editor.getDocument();
+                    lineNumber = document.getLineNumber(methodCall.getTextOffset()) + 1;
+                }
+            }
+        }
+
         ClassificationPopUp dialog = new ClassificationPopUp();
         ToolWindow toolWindow = ToolWindow.getInstance();
         toolWindow.setCurrentDialog(dialog);
 
         if(dialog.showAndGet()){
-            String text = dialog.getTextFieldValue();
+            String textFieldValue = dialog.getTextFieldValue();
+            System.out.println("textfieldValue: " + textFieldValue);
+            List<Integer> lineNumbers = List.of(lineNumber);
+            HashMap<String, List<Integer>> occurences = new HashMap<>();
+            if(!textFieldValue.isEmpty()){
+                lineNumbers = Arrays.stream(textFieldValue.split(",")).map(Integer :: parseInt).toList();
+            }
 
+            occurences.put(psiFile.getName(), new ArrayList<>(lineNumbers));
+            SecurityClass securityClass = new SecurityClass(methodQualifiedName,occurences);
+            for(SecurityClass sc : SecurityclassUtils.getSecurityClasses()){
+                if(securityClass.getName().equals(sc.getName())){
+                    for(Integer line : lineNumbers){
+                        sc.getOccurrences().get(psiFile.getName()).add(line);
+                    }
+                    return;
+                }
+            }
+            SecurityclassUtils.addSecurityClass(securityClass);
         }
 
     }
 
 
+    private boolean validateTextfieldInput(String input){
+        String regex = "^(0|[1-9][0-9]*)(,(0|[1-9][0-9]*))*$";
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(input);
+        return matcher.matches();
+    }
     @Override
     public void update(@NotNull AnActionEvent e) {
         e.getPresentation().setEnabledAndVisible(true);

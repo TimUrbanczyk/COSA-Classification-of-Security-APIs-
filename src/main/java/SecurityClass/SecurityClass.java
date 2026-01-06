@@ -7,5 +7,5 @@ import java.util.Map;
 @Data
 public class SecurityClass {
     private final String name;
-    public final  Map<String, List<Integer>> occurrences;
+    public final Map<String, List<Integer>> occurrences;
 }
