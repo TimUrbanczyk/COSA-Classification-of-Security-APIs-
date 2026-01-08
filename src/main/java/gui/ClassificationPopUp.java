@@ -12,7 +12,7 @@ import java.awt.*;
 import java.util.List;
 
 public class ClassificationPopUp extends DialogWrapper {
-    private List<SecurityClass> securityclasses = SecurityclassUtils.getSecurityClasses();
+    private static List<SecurityClass> securityclasses = SecurityclassUtils.getSecurityClasses();
     private JTextField textField;
 
     public ClassificationPopUp(){
@@ -47,13 +47,12 @@ public class ClassificationPopUp extends DialogWrapper {
     }
 
 
-    private void syncSecurityclasses(){
+    private static void syncSecurityclasses(){
         securityclasses = SecurityclassUtils.getSecurityClasses();
-        
 
     }
 
-    public void refresh(){
+    public static void refresh(){
         syncSecurityclasses();
     }
 }

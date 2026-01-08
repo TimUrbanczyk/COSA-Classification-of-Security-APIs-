@@ -23,13 +23,11 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class ShowMethodPopupAction extends AnAction {
-
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
         if(e.getProject() == null) {
             return;
         }
-
 
         String methodQualifiedName = null;
         int lineNumber = 0;
@@ -64,20 +62,34 @@ public class ShowMethodPopupAction extends AnAction {
 
             occurences.put(psiFile.getName(), new ArrayList<>(lineNumbers));
             SecurityClass securityClass = new SecurityClass(methodQualifiedName,occurences);
+            boolean foundExisting = false;
             for(SecurityClass sc : SecurityclassUtils.getSecurityClasses()){
                 if(securityClass.getName().equals(sc.getName())){
                     for(Integer line : lineNumbers){
-                        sc.getOccurrences().get(psiFile.getName()).add(line);
+                        if (!sc.getOccurrences().containsKey(psiFile.getName())) {
+                            sc.getOccurrences().put(psiFile.getName(), new ArrayList<>());
+                        }
+                        if (!sc.getOccurrences().get(psiFile.getName()).contains(line)) {
+                            sc.getOccurrences().get(psiFile.getName()).add(line);
+                        }
                     }
-                    return;
+                    foundExisting = true;
+                    break;
                 }
             }
-            SecurityclassUtils.addSecurityClass(securityClass);
+            if (!foundExisting) {
+                SecurityclassUtils.addSecurityClass(securityClass);
+            }
+            // Auto-refresh the tool window table
+            if (toolWindow != null) {
+                toolWindow.refreshTable();
+            }
         }
 
     }
 
 
+    //regex is corupted yet
     private boolean validateTextfieldInput(String input){
         String regex = "^(0|[1-9][0-9]*)(,(0|[1-9][0-9]*))*$";
         Pattern pattern = Pattern.compile(regex);

@@ -29,6 +29,9 @@ public class ToolWindow implements ToolWindowFactory, DumbAware {
     private final List<MappingNode> allParendMappingNodes = mappingLoader.loadAllParentMappings();
     private final MappingLocator mappingLocator = new MappingLocator();
     private ClassificationPopUp currentDialog;
+    private JTable tableSecurityClasses;
+    @Getter
+    private JPanel panel;
 
     @Getter
     private static ToolWindow instance;
@@ -37,9 +40,10 @@ public class ToolWindow implements ToolWindowFactory, DumbAware {
     public void createToolWindowContent(Project project, com.intellij.openapi.wm.ToolWindow toolwindow) {
 
         ToolWindow.instance = this;
-        JPanel panel = new JPanel();
+        panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         JButton buttonMarkSecurityAPIS = new JButton("Locate & Mark security apis");
-        JTable tableSecurityClasses = createTable(SecurityclassUtils.getSecurityClasses());
+        tableSecurityClasses = createTable(SecurityclassUtils.getSecurityClasses());
 
         buttonMarkSecurityAPIS.addActionListener(e->{
             List<MappingNode> allMappingNodes = new ArrayList<>();
@@ -53,26 +57,10 @@ public class ToolWindow implements ToolWindowFactory, DumbAware {
                  mappingLocator.locateMapping(mappingNode,currentPsiElement);
             }
 
-            DefaultTableModel model = (DefaultTableModel) tableSecurityClasses.getModel();
-            model.setRowCount(0);
-            for(SecurityClass securityClass : SecurityclassUtils.getSecurityClasses()){
-
-                model.addRow(new Object[]{
-                        securityClass.getName(),
-                        Arrays.toString(
-                                securityClass.getOccurrences()
-                                .values()
-                                .stream()
-                                .flatMap(List::stream)
-                                .distinct()
-                                .mapToInt(Integer::intValue)
-                                .toArray())
-                });
-
+            refreshTable();
+            if (currentDialog != null) {
+                currentDialog.refresh();
             }
-            currentDialog.refresh();
-
-
 
 
         });
@@ -85,6 +73,34 @@ public class ToolWindow implements ToolWindowFactory, DumbAware {
         ContentFactory contentFactory = ContentFactory.getInstance();
         Content content = contentFactory.createContent(panel, "", false);
         toolwindow.getContentManager().addContent(content);
+    }
+
+    public void populateTable(int with, int height){
+        refreshTable();
+    }
+
+    public void refreshTable(){
+        if (tableSecurityClasses == null) {
+            return;
+        }
+        DefaultTableModel model = (DefaultTableModel) tableSecurityClasses.getModel();
+        model.setRowCount(0);
+        for(SecurityClass securityClass : SecurityclassUtils.getSecurityClasses()){
+
+            model.addRow(new Object[]{
+                    securityClass.getName(),
+                    Arrays.toString(
+                            securityClass.getOccurrences()
+                                    .values()
+                                    .stream()
+                                    .flatMap(List::stream)
+                                    .distinct()
+                                    .mapToInt(Integer::intValue)
+                                    .toArray())
+            });
+
+        }
+        model.fireTableDataChanged();
     }
 
     public void setCurrentDialog(ClassificationPopUp dialog) {
