@@ -15,11 +15,9 @@ import org.jetbrains.annotations.NotNull;
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+
 
 public class ShowMethodPopupAction extends AnAction {
     @Override
@@ -52,15 +50,24 @@ public class ShowMethodPopupAction extends AnAction {
 
         if(dialog.showAndGet()){
             String textFieldValue = dialog.getTextFieldValue();
-            System.out.println("textfieldValue: " + textFieldValue);
-            List<Integer> lineNumbers = List.of(lineNumber);
-            HashMap<String, List<Integer>> occurences = new HashMap<>();
-            if(!textFieldValue.isEmpty()){
-                lineNumbers = Arrays.stream(textFieldValue.split(",")).map(Integer :: parseInt).toList();
+            if (textFieldValue == null || textFieldValue.trim().isEmpty()) {
+                return;
+            }
+            
+            String securityClassName = textFieldValue.trim();
+            List<Integer> lineNumbers = new ArrayList<>();
+            
+            if (lineNumber > 0) {
+                lineNumbers.add(lineNumber);
+            } else if (editor != null && psiFile != null) {
+                int offset = editor.getCaretModel().getOffset();
+                Document document = editor.getDocument();
+                lineNumbers.add(document.getLineNumber(offset) + 1);
             }
 
+            HashMap<String, List<Integer>> occurences = new HashMap<>();
             occurences.put(psiFile.getName(), new ArrayList<>(lineNumbers));
-            SecurityClass securityClass = new SecurityClass(methodQualifiedName,occurences);
+            SecurityClass securityClass = new SecurityClass(securityClassName, occurences);
             boolean foundExisting = false;
             for(SecurityClass sc : SecurityclassUtils.getSecurityClasses()){
                 if(securityClass.getName().equals(sc.getName())){
@@ -79,7 +86,6 @@ public class ShowMethodPopupAction extends AnAction {
             if (!foundExisting) {
                 SecurityclassUtils.addSecurityClass(securityClass);
             }
-            // Auto-refresh the tool window table
             if (toolWindow != null) {
                 toolWindow.refreshTable();
             }
@@ -88,13 +94,6 @@ public class ShowMethodPopupAction extends AnAction {
     }
 
 
-    //regex is corupted yet
-    private boolean validateTextfieldInput(String input){
-        String regex = "^(0|[1-9][0-9]*)(,(0|[1-9][0-9]*))*$";
-        Pattern pattern = Pattern.compile(regex);
-        Matcher matcher = pattern.matcher(input);
-        return matcher.matches();
-    }
     @Override
     public void update(@NotNull AnActionEvent e) {
         e.getPresentation().setEnabledAndVisible(true);

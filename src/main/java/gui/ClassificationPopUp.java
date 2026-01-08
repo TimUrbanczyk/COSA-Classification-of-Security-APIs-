@@ -28,7 +28,7 @@ public class ClassificationPopUp extends DialogWrapper {
         panel.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
 
         JPanel textPanel = new JPanel(new BorderLayout(5, 5));
-        JLabel label = new JLabel("Enter Lines:");
+        JLabel label = new JLabel("Enter SC:");
         textField = new JTextField(20);
         List<String> securityClassNames = securityclasses.stream().map(SecurityClass::getName).toList();
         AutoCompleteDecorator.decorate(textField, securityClassNames ,false);
