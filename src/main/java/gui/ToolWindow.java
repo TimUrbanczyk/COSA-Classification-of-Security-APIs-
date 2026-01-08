@@ -46,15 +46,20 @@ public class ToolWindow implements ToolWindowFactory, DumbAware {
         tableSecurityClasses = createTable(SecurityclassUtils.getSecurityClasses());
 
         buttonMarkSecurityAPIS.addActionListener(e->{
+            VirtualFile currentFile = getCurrentFile(project);
+            if (currentFile == null) {
+                return;
+            }
+
             List<MappingNode> allMappingNodes = new ArrayList<>();
 
             for(MappingNode mappingNode: allParendMappingNodes){
                 allMappingNodes.addAll(mappingLoader.getAllChildMappings(mappingNode, new ArrayList<>()));
             }
 
-            PsiElement currentPsiElement = PsiUtils.getPsiFile(project,getCurrentFile(project));
+            PsiElement currentPsiElement = PsiUtils.getPsiFile(project, currentFile);
             for(MappingNode mappingNode : allMappingNodes){
-                 mappingLocator.locateMapping(mappingNode,currentPsiElement);
+                 mappingLocator.locateMapping(mappingNode, currentPsiElement);
             }
 
             refreshTable();
@@ -142,6 +147,9 @@ public class ToolWindow implements ToolWindowFactory, DumbAware {
     private VirtualFile getCurrentFile(Project project){
         FileEditorManager manager = FileEditorManager.getInstance(project);
         VirtualFile[] files = manager.getSelectedFiles();
+        if (files == null || files.length == 0) {
+            return null;
+        }
         return files[0];
     }
 

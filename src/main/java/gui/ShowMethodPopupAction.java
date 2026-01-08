@@ -1,6 +1,5 @@
 package gui;
 
-
 import SecurityClass.SecurityClass;
 import SecurityClass.SecurityclassUtils;
 import com.intellij.openapi.actionSystem.AnAction;
