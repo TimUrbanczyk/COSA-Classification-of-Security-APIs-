@@ -75,10 +75,6 @@ public class ToolWindow implements ToolWindowFactory, DumbAware {
         toolwindow.getContentManager().addContent(content);
     }
 
-    public void populateTable(int with, int height){
-        refreshTable();
-    }
-
     public void refreshTable(){
         if (tableSecurityClasses == null) {
             return;
@@ -86,18 +82,14 @@ public class ToolWindow implements ToolWindowFactory, DumbAware {
         DefaultTableModel model = (DefaultTableModel) tableSecurityClasses.getModel();
         model.setRowCount(0);
         for(SecurityClass securityClass : SecurityclassUtils.getSecurityClasses()){
+            for(int row : securityClass.getOccurrences().entrySet().stream().findFirst().get().getValue()){
+                model.addRow(new Object[]{
+                        securityClass.getName(),
+                        securityClass.getOccurrences().keySet().stream().findFirst().get(),
+                        row
+                });
+            }
 
-            model.addRow(new Object[]{
-                    securityClass.getName(),
-                    Arrays.toString(
-                            securityClass.getOccurrences()
-                                    .values()
-                                    .stream()
-                                    .flatMap(List::stream)
-                                    .distinct()
-                                    .mapToInt(Integer::intValue)
-                                    .toArray())
-            });
 
         }
         model.fireTableDataChanged();
@@ -112,7 +104,7 @@ public class ToolWindow implements ToolWindowFactory, DumbAware {
 
 
     private JTable createTable(List<SecurityClass> data){
-        String[] columns = {"Securityclass","Ocurrencess"};
+        String[] columns = {"Securityclass","Filename","line/row"};
 
         DefaultTableModel model = new DefaultTableModel(columns,0){
             @Override
@@ -130,6 +122,7 @@ public class ToolWindow implements ToolWindowFactory, DumbAware {
 
             model.addRow(new Object[]{
                     securityClass.getName(),
+                    securityClass.getOccurrences().keySet().stream().findFirst().get(),
                     lineCount
             });
         }

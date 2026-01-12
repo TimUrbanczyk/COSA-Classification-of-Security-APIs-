@@ -68,7 +68,6 @@ public class ShowMethodPopupAction extends AnAction {
             HashMap<String, List<Integer>> occurences = new HashMap<>();
             occurences.put(psiFile.getName(), new ArrayList<>(lineNumbers));
             SecurityClass securityClass = new SecurityClass(securityClassName, occurences);
-            boolean foundExisting = false;
             for(SecurityClass sc : SecurityclassUtils.getSecurityClasses()){
                 if(securityClass.getName().equals(sc.getName())){
                     for(Integer line : lineNumbers){
@@ -79,13 +78,11 @@ public class ShowMethodPopupAction extends AnAction {
                             sc.getOccurrences().get(psiFile.getName()).add(line);
                         }
                     }
-                    foundExisting = true;
                     break;
                 }
             }
-            if (!foundExisting) {
-                SecurityclassUtils.addSecurityClass(securityClass);
-            }
+            SecurityclassUtils.addSecurityClass(securityClass);
+
             if (toolWindow != null) {
                 toolWindow.refreshTable();
             }
