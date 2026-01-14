@@ -2,6 +2,7 @@ package gui;
 
 import SecurityClass.SecurityClass;
 import SecurityClass.SecurityclassUtils;
+import com.intellij.openapi.roots.ProjectRootManager;
 import com.intellij.psi.PsiElement;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.table.JBTable;
@@ -30,6 +31,8 @@ public class ToolWindow implements ToolWindowFactory, DumbAware {
     private final MappingLocator mappingLocator = new MappingLocator();
     private ClassificationPopUp currentDialog;
     private JTable tableSecurityClasses;
+    private List<VirtualFile> projectFiles = new ArrayList<>();
+
     @Getter
     private JPanel panel;
 
@@ -42,12 +45,18 @@ public class ToolWindow implements ToolWindowFactory, DumbAware {
         ToolWindow.instance = this;
         panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-        JButton buttonMarkSecurityAPIS = new JButton("Locate & Mark security apis");
+        JButton buttonMarkSecurityApisSingleFile = new JButton("Mark apis in File");
+        JButton buttonMarkSecurityApisProjekt= new JButton("Mark apis in Projekt");
         tableSecurityClasses = createTable(SecurityclassUtils.getSecurityClasses());
+        
+        // Create a horizontal panel for the buttons
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
+        buttonPanel.add(buttonMarkSecurityApisSingleFile);
+        buttonPanel.add(buttonMarkSecurityApisProjekt);
 
-        buttonMarkSecurityAPIS.addActionListener(e->{
+        buttonMarkSecurityApisSingleFile.addActionListener(e->{
             List<MappingNode> allMappingNodes = new ArrayList<>();
-
             for(MappingNode mappingNode: allParendMappingNodes){
                 allMappingNodes.addAll(mappingLoader.getAllChildMappings(mappingNode, new ArrayList<>()));
             }
@@ -65,8 +74,30 @@ public class ToolWindow implements ToolWindowFactory, DumbAware {
 
         });
 
+        buttonMarkSecurityApisProjekt.addActionListener(e->{
+            List<MappingNode> allMappingNodes = new ArrayList<>();
+            for(MappingNode mappingNode: allParendMappingNodes){
+                allMappingNodes.addAll(mappingLoader.getAllChildMappings(mappingNode, new ArrayList<>()));
+            }
 
-        panel.add(buttonMarkSecurityAPIS);
+            projectFiles.clear(); // Clear previous files to prevent duplicates
+            findProjectFiles(project);
+            for(VirtualFile virtualFile : projectFiles) {
+                PsiElement currentPsiElement = PsiUtils.getPsiFile(project, virtualFile);
+                for (MappingNode mappingNode : allMappingNodes) {
+                    mappingLocator.locateMapping(mappingNode, currentPsiElement);
+                }
+            }
+
+            refreshTable();
+            if (currentDialog != null) {
+                currentDialog.refresh();
+            }
+
+
+        });
+
+        panel.add(buttonPanel);
         JScrollPane tableScrollPane = new JBScrollPane(tableSecurityClasses);
         tableScrollPane.setPreferredSize(new Dimension(toolwindow.getComponent().getWidth(), toolwindow.getComponent().getHeight()));
         panel.add(tableScrollPane);
@@ -82,15 +113,17 @@ public class ToolWindow implements ToolWindowFactory, DumbAware {
         DefaultTableModel model = (DefaultTableModel) tableSecurityClasses.getModel();
         model.setRowCount(0);
         for(SecurityClass securityClass : SecurityclassUtils.getSecurityClasses()){
-            for(int row : securityClass.getOccurrences().entrySet().stream().findFirst().get().getValue()){
-                model.addRow(new Object[]{
-                        securityClass.getName(),
-                        securityClass.getOccurrences().keySet().stream().findFirst().get(),
-                        row
-                });
+            // Iterate through all files and all line numbers to show all occurrences
+            for(Map.Entry<String, List<Integer>> entry : securityClass.getOccurrences().entrySet()){
+                String fileName = entry.getKey();
+                for(Integer lineNumber : entry.getValue()){
+                    model.addRow(new Object[]{
+                            securityClass.getName(),
+                            fileName,
+                            lineNumber
+                    });
+                }
             }
-
-
         }
         model.fireTableDataChanged();
     }
@@ -137,6 +170,25 @@ public class ToolWindow implements ToolWindowFactory, DumbAware {
         VirtualFile[] files = manager.getSelectedFiles();
         return files[0];
     }
+
+    private void findProjectFiles(Project project){
+        VirtualFile[] roots = ProjectRootManager.getInstance(project).getContentSourceRoots();
+        for(VirtualFile root : roots){
+            traverseFiles(root);
+        }
+    }
+
+    private void traverseFiles(VirtualFile file){
+        System.out.println(file);
+        if(!file.isDirectory() && !projectFiles.contains(file)){
+            projectFiles.add(file);
+        }
+        for(VirtualFile child: file.getChildren()){
+            traverseFiles(child);
+        }
+    }
+
+
 
 
 }

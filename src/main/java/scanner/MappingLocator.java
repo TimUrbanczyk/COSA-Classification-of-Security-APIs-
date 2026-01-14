@@ -183,9 +183,12 @@ public class MappingLocator {
                     .findFirst();
 
             if(existingSecurityClass.isPresent()){
-                existingSecurityClass.get().occurrences
-                        .computeIfAbsent(fileName, k -> new ArrayList<>())
-                        .add(line);
+                List<Integer> fileLines = existingSecurityClass.get().occurrences
+                        .computeIfAbsent(fileName, k -> new ArrayList<>());
+                // Only add if line doesn't already exist to prevent duplicates
+                if (!fileLines.contains(line)) {
+                    fileLines.add(line);
+                }
             } else {
                 SecurityClass securityClass =
                         new SecurityClass(category, new HashMap<>());
