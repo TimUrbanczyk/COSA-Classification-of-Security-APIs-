@@ -6,6 +6,7 @@ import com.intellij.openapi.roots.ProjectRootManager;
 import com.intellij.psi.PsiElement;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.table.JBTable;
+import com.jetbrains.i.i.i.i.C.T;
 import data.MappingLoader;
 import data.MappingNode;
 import lombok.Getter;
@@ -20,6 +21,7 @@ import com.intellij.ui.content.Content;
 import com.intellij.ui.content.ContentFactory;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableRowSorter;
 import java.awt.*;
 import java.util.*;
 import java.util.List;
@@ -32,6 +34,7 @@ public class ToolWindow implements ToolWindowFactory, DumbAware {
     private ClassificationPopUp currentDialog;
     private JTable tableSecurityClasses;
     private List<VirtualFile> projectFiles = new ArrayList<>();
+    private Integer currentSortColumn = null;
 
     @Getter
     private JPanel panel;
@@ -46,14 +49,18 @@ public class ToolWindow implements ToolWindowFactory, DumbAware {
         panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         JButton buttonMarkSecurityApisSingleFile = new JButton("Mark apis in File");
-        JButton buttonMarkSecurityApisProjekt= new JButton("Mark apis in Projekt");
+        JButton buttonMarkSecurityApisProjekt = new JButton("Mark apis in Projekt");
+        JButton buttonSortByFile = new JButton("Sort by Filename");
+        JButton buttonSortBySecurityClass = new JButton("Sort by SC name");
         tableSecurityClasses = createTable(SecurityclassUtils.getSecurityClasses());
+
         
-        // Create a horizontal panel for the buttons
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
         buttonPanel.add(buttonMarkSecurityApisSingleFile);
         buttonPanel.add(buttonMarkSecurityApisProjekt);
+        buttonPanel.add(buttonSortByFile);
+        buttonPanel.add(buttonSortBySecurityClass);
 
         buttonMarkSecurityApisSingleFile.addActionListener(e->{
             List<MappingNode> allMappingNodes = new ArrayList<>();
@@ -80,7 +87,7 @@ public class ToolWindow implements ToolWindowFactory, DumbAware {
                 allMappingNodes.addAll(mappingLoader.getAllChildMappings(mappingNode, new ArrayList<>()));
             }
 
-            projectFiles.clear(); // Clear previous files to prevent duplicates
+            projectFiles.clear();
             findProjectFiles(project);
             for(VirtualFile virtualFile : projectFiles) {
                 PsiElement currentPsiElement = PsiUtils.getPsiFile(project, virtualFile);
@@ -97,9 +104,17 @@ public class ToolWindow implements ToolWindowFactory, DumbAware {
 
         });
 
+        buttonSortByFile.addActionListener(e ->{
+            sortTableByColumn(1);
+        });
+
+        buttonSortBySecurityClass.addActionListener(e ->{
+            sortTableByColumn(0);
+        });
+
         panel.add(buttonPanel);
         JScrollPane tableScrollPane = new JBScrollPane(tableSecurityClasses);
-        tableScrollPane.setPreferredSize(new Dimension(toolwindow.getComponent().getWidth(), toolwindow.getComponent().getHeight()));
+        tableScrollPane.setPreferredSize(new Dimension((int)(toolwindow.getComponent().getWidth() * 1.5), toolwindow.getComponent().getHeight()));
         panel.add(tableScrollPane);
         ContentFactory contentFactory = ContentFactory.getInstance();
         Content content = contentFactory.createContent(panel, "", false);
@@ -113,7 +128,6 @@ public class ToolWindow implements ToolWindowFactory, DumbAware {
         DefaultTableModel model = (DefaultTableModel) tableSecurityClasses.getModel();
         model.setRowCount(0);
         for(SecurityClass securityClass : SecurityclassUtils.getSecurityClasses()){
-            // Iterate through all files and all line numbers to show all occurrences
             for(Map.Entry<String, List<Integer>> entry : securityClass.getOccurrences().entrySet()){
                 String fileName = entry.getKey();
                 for(Integer lineNumber : entry.getValue()){
@@ -126,6 +140,17 @@ public class ToolWindow implements ToolWindowFactory, DumbAware {
             }
         }
         model.fireTableDataChanged();
+        if (currentSortColumn != null) {
+            sortTableByColumn(currentSortColumn);
+        }
+    }
+
+    private void sortTableByColumn(int column){
+        currentSortColumn = column;
+        DefaultTableModel model = (DefaultTableModel) tableSecurityClasses.getModel();
+        TableRowSorter<DefaultTableModel> sorter = new TableRowSorter<>(model);
+        tableSecurityClasses.setRowSorter(sorter);
+        sorter.setSortKeys(List.of(new RowSorter.SortKey(column, SortOrder.ASCENDING)));
     }
 
     public void setCurrentDialog(ClassificationPopUp dialog) {
