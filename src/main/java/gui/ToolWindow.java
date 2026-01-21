@@ -251,30 +251,15 @@ public class ToolWindow implements ToolWindowFactory, DumbAware {
             }
         }
 
-        VirtualFile[] roots = ProjectRootManager.getInstance(project).getContentSourceRoots();
-        for (VirtualFile root : roots) {
-            VirtualFile found = findFileRecursive(root, fileName);
-            if (found != null) {
-                return found;
+        findProjectFiles(project);
+        for (VirtualFile file : projectFiles) {
+            if (file.getName().equals(fileName) || file.getPath().endsWith(fileName)) {
+                return file;
             }
         }
 
         return null;
     }
 
-    private VirtualFile findFileRecursive(VirtualFile file, String fileName) {
-        if (!file.isDirectory() && (file.getName().equals(fileName) || file.getPath().endsWith(fileName))) {
-            return file;
-        }
-        if (file.isDirectory()) {
-            for (VirtualFile child : file.getChildren()) {
-                VirtualFile found = findFileRecursive(child, fileName);
-                if (found != null) {
-                    return found;
-                }
-            }
-        }
-        return null;
-    }
 
 }
