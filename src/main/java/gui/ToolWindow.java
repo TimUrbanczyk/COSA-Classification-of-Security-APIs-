@@ -53,7 +53,7 @@ public class ToolWindow implements ToolWindowFactory, DumbAware {
         JButton buttonSortByFile = new JButton("Sort by Filename");
         JButton buttonSortBySecurityClass = new JButton("Sort by SC name");
         tableSecurityClasses = createTable(SecurityclassUtils.getSecurityClasses());
-
+        addTableClickListener(project);
         
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
@@ -213,7 +213,68 @@ public class ToolWindow implements ToolWindowFactory, DumbAware {
         }
     }
 
+    private void addTableClickListener(Project project) {
+        tableSecurityClasses.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                int row = tableSecurityClasses.rowAtPoint(evt.getPoint());
+                if (row >= 0) {
+                    String fileName = (String) tableSecurityClasses.getValueAt(row, 1);
+                    Integer lineNumber = (Integer) tableSecurityClasses.getValueAt(row, 2);
 
+                    navigateToLine(project, fileName, lineNumber);
+                }
+            }
+        });
+    }
 
+    private void navigateToLine(Project project, String fileName, int lineNumber) {
+        VirtualFile targetFile = findFileByName(project, fileName);
+
+        if (targetFile != null) {
+            FileEditorManager editorManager = FileEditorManager.getInstance(project);
+            editorManager.openFile(targetFile, true);
+
+            com.intellij.openapi.editor.Editor editor = editorManager.getSelectedTextEditor();
+            if (editor != null && lineNumber > 0) {
+                int offset = editor.getDocument().getLineStartOffset(lineNumber - 1);
+                editor.getCaretModel().moveToOffset(offset);
+                editor.getScrollingModel().scrollToCaret(com.intellij.openapi.editor.ScrollType.CENTER);
+            }
+        }
+    }
+
+    private VirtualFile findFileByName(Project project, String fileName) {
+        for (VirtualFile file : projectFiles) {
+            if (file.getName().equals(fileName) || file.getPath().endsWith(fileName)) {
+                return file;
+            }
+        }
+
+        VirtualFile[] roots = ProjectRootManager.getInstance(project).getContentSourceRoots();
+        for (VirtualFile root : roots) {
+            VirtualFile found = findFileRecursive(root, fileName);
+            if (found != null) {
+                return found;
+            }
+        }
+
+        return null;
+    }
+
+    private VirtualFile findFileRecursive(VirtualFile file, String fileName) {
+        if (!file.isDirectory() && (file.getName().equals(fileName) || file.getPath().endsWith(fileName))) {
+            return file;
+        }
+        if (file.isDirectory()) {
+            for (VirtualFile child : file.getChildren()) {
+                VirtualFile found = findFileRecursive(child, fileName);
+                if (found != null) {
+                    return found;
+                }
+            }
+        }
+        return null;
+    }
 
 }
