@@ -199,6 +199,10 @@ public class ToolWindow implements ToolWindowFactory, DumbAware {
     private void findProjectFiles(Project project){
         VirtualFile[] roots = ProjectRootManager.getInstance(project).getContentSourceRoots();
         for(VirtualFile root : roots){
+            if(!root.getPath().contains("/src/main/java")){
+                continue;
+            }
+            System.out.println(root);
             traverseFiles(root);
         }
     }
