@@ -38,7 +38,7 @@ dependencies {
 
     testAnnotationProcessor("org.projectlombok:lombok:1.18.32")
 
-    implementation("com.fasterxml.jackson.core:jackson-databind:2.17.2")
+    implementation("com.fasterxml.jackson.core:jackson-databind:2.20.1")
 
     intellijPlatform {
         create(providers.gradleProperty("platformType"), providers.gradleProperty("platformVersion"))
