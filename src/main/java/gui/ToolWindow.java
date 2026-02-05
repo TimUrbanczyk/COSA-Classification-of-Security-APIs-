@@ -199,9 +199,6 @@ public class ToolWindow implements ToolWindowFactory, DumbAware {
     private void findProjectFiles(Project project){
         VirtualFile[] roots = ProjectRootManager.getInstance(project).getContentSourceRoots();
         for(VirtualFile root : roots){
-            if(!root.getPath().contains("/src/main/java")){
-                continue;
-            }
             System.out.println(root);
             traverseFiles(root);
         }
@@ -225,6 +222,9 @@ public class ToolWindow implements ToolWindowFactory, DumbAware {
                 if (row >= 0) {
                     String fileName = (String) tableSecurityClasses.getValueAt(row, 1);
                     Integer lineNumber = (Integer) tableSecurityClasses.getValueAt(row, 2);
+
+                    System.out.println("Clicked - File: " + fileName + ", Line: " + lineNumber);
+                    System.out.println("Project files count: " + projectFiles.size());
 
                     navigateToLine(project, fileName, lineNumber);
                 }
