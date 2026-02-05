@@ -223,9 +223,6 @@ public class ToolWindow implements ToolWindowFactory, DumbAware {
                     String fileName = (String) tableSecurityClasses.getValueAt(row, 1);
                     Integer lineNumber = (Integer) tableSecurityClasses.getValueAt(row, 2);
 
-                    System.out.println("Clicked - File: " + fileName + ", Line: " + lineNumber);
-                    System.out.println("Project files count: " + projectFiles.size());
-
                     navigateToLine(project, fileName, lineNumber);
                 }
             }
