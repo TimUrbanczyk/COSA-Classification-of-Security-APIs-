@@ -25,6 +25,10 @@ import javax.swing.table.TableRowSorter;
 import java.awt.*;
 import java.util.*;
 import java.util.List;
+import com.intellij.openapi.command.WriteCommandAction;
+import com.intellij.openapi.editor.Document;
+import com.intellij.psi.PsiDocumentManager;
+import com.intellij.psi.PsiFile;
 
 public class ToolWindow implements ToolWindowFactory, DumbAware {
 
@@ -50,6 +54,7 @@ public class ToolWindow implements ToolWindowFactory, DumbAware {
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         JButton buttonMarkSecurityApisSingleFile = new JButton("Mark apis in File");
         JButton buttonMarkSecurityApisProjekt = new JButton("Mark apis in Projekt");
+        JButton buttonAnnotateApis = new JButton("Annotate apis");
         JButton buttonSortByFile = new JButton("Sort by Filename");
         JButton buttonSortBySecurityClass = new JButton("Sort by SC name");
         tableSecurityClasses = createTable(SecurityclassUtils.getSecurityClasses());
@@ -59,6 +64,7 @@ public class ToolWindow implements ToolWindowFactory, DumbAware {
         buttonPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
         buttonPanel.add(buttonMarkSecurityApisSingleFile);
         buttonPanel.add(buttonMarkSecurityApisProjekt);
+        buttonPanel.add(buttonAnnotateApis);
         buttonPanel.add(buttonSortByFile);
         buttonPanel.add(buttonSortBySecurityClass);
 
@@ -102,6 +108,10 @@ public class ToolWindow implements ToolWindowFactory, DumbAware {
             }
 
 
+        });
+
+        buttonAnnotateApis.addActionListener(e -> {
+            annotateSecurityApis(project);
         });
 
         buttonSortByFile.addActionListener(e ->{
@@ -262,5 +272,75 @@ public class ToolWindow implements ToolWindowFactory, DumbAware {
         return null;
     }
 
+    private void annotateSecurityApis(Project project) {
+        Map<String, Map<Integer, Set<String>>> fileAnnotations = new HashMap<>();
 
+        for (SecurityClass securityClass : SecurityclassUtils.getSecurityClasses()) {
+            for (Map.Entry<String, List<Integer>> entry : securityClass.getOccurrences().entrySet()) {
+                String fileName = entry.getKey();
+                fileAnnotations.putIfAbsent(fileName, new HashMap<>());
+
+                for (Integer lineNumber : entry.getValue()) {
+                    fileAnnotations.get(fileName).putIfAbsent(lineNumber, new HashSet<>());
+                    fileAnnotations.get(fileName).get(lineNumber).add(securityClass.getName());
+                }
+            }
+        }
+
+        // Add annotations to each file
+        for (Map.Entry<String, Map<Integer, Set<String>>> fileEntry : fileAnnotations.entrySet()) {
+            String fileName = fileEntry.getKey();
+            Map<Integer, Set<String>> lineAnnotations = fileEntry.getValue();
+
+            VirtualFile virtualFile = findFileByName(project, fileName);
+            if (virtualFile != null) {
+                addAnnotationsToFile(project, virtualFile, lineAnnotations);
+            }
+        }
+
+        JOptionPane.showMessageDialog(panel,
+                "Annotations added successfully!",
+                "Annotate APIs",
+                JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    private void addAnnotationsToFile(Project project, VirtualFile virtualFile, Map<Integer, Set<String>> lineAnnotations) {
+        WriteCommandAction.runWriteCommandAction(project, () -> {
+            PsiFile psiFile = (PsiFile) PsiUtils.getPsiFile(project, virtualFile);
+            if (psiFile == null) {
+                return;
+            }
+
+            Document document = PsiDocumentManager.getInstance(project).getDocument(psiFile);
+            if (document == null) {
+                return;
+            }
+
+            List<Integer> sortedLines = new ArrayList<>(lineAnnotations.keySet());
+            sortedLines.sort(Collections.reverseOrder());
+
+            for (Integer lineNumber : sortedLines) {
+                if (lineNumber > 0 && lineNumber <= document.getLineCount()) {
+                    Set<String> securityClasses = lineAnnotations.get(lineNumber);
+                    String annotation = String.join(", ", securityClasses);
+
+                    int lineStartOffset = document.getLineStartOffset(lineNumber - 1);
+                    String lineText = document.getText(
+                            new com.intellij.openapi.util.TextRange(
+                                    lineStartOffset,
+                                    document.getLineEndOffset(lineNumber - 1)
+                            )
+                    );
+
+                    String indentation = lineText.substring(0, lineText.length() - lineText.trim().length());
+
+                    String comment = indentation + "// TODO: Security API - " + annotation + "\n";
+
+                    document.insertString(lineStartOffset, comment);
+                }
+            }
+
+            PsiDocumentManager.getInstance(project).commitDocument(document);
+        });
+    }
 }
