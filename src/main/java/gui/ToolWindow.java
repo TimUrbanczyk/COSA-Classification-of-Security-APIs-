@@ -22,6 +22,8 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableRowSorter;
 import java.awt.*;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.util.*;
 import java.util.List;
 import com.intellij.openapi.command.WriteCommandAction;
@@ -61,13 +63,26 @@ public class ToolWindow implements ToolWindowFactory, DumbAware {
         addTableClickListener(project);
         
         JPanel buttonPanel = new JPanel();
-        buttonPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
-        buttonPanel.add(buttonMarkSecurityApisSingleFile);
-        buttonPanel.add(buttonMarkSecurityApisProjekt);
-        buttonPanel.add(buttonAnnotateApis);
-        buttonPanel.add(buttonSortByFile);
-        buttonPanel.add(buttonSortBySecurityClass);
-        buttonPanel.add(buttonClearTable);
+        List<JButton> buttons = List.of(
+                buttonMarkSecurityApisSingleFile,
+                buttonMarkSecurityApisProjekt,
+                buttonAnnotateApis,
+                buttonSortByFile,
+                buttonSortBySecurityClass,
+                buttonClearTable
+        );
+        for (JButton b : buttons) {
+            buttonPanel.add(b);
+        }
+        updateButtonGrid(buttonPanel, buttons, toolwindow.getComponent().getWidth());
+        toolwindow.getComponent().addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentResized(ComponentEvent e) {
+                updateButtonGrid(buttonPanel, buttons, toolwindow.getComponent().getWidth());
+                buttonPanel.revalidate();
+                buttonPanel.repaint();
+            }
+        });
 
 
         buttonClearTable.addActionListener(e->{
@@ -297,7 +312,6 @@ public class ToolWindow implements ToolWindowFactory, DumbAware {
             }
         }
 
-        // Add annotations to each file
         for (Map.Entry<String, Map<Integer, Set<String>>> fileEntry : fileAnnotations.entrySet()) {
             String fileName = fileEntry.getKey();
             Map<Integer, Set<String>> lineAnnotations = fileEntry.getValue();
@@ -352,5 +366,17 @@ public class ToolWindow implements ToolWindowFactory, DumbAware {
 
             PsiDocumentManager.getInstance(project).commitDocument(document);
         });
+    }
+
+    private void updateButtonGrid(JPanel buttonPanel, List<JButton> buttons, int availableWidth) {
+        int maxButtonWidth = 0;
+        for (JButton b : buttons) {
+            maxButtonWidth = Math.max(maxButtonWidth, b.getPreferredSize().width);
+        }
+        int hGap = 6;
+        int vGap = 6;
+        int cols = Math.max(1, (availableWidth - 20) / Math.max(1, (maxButtonWidth + hGap)));
+        GridLayout layout = new GridLayout(0, cols, hGap, vGap);
+        buttonPanel.setLayout(layout);
     }
 }
