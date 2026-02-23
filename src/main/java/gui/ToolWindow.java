@@ -344,7 +344,7 @@ public class ToolWindow implements ToolWindowFactory, DumbAware {
 
                     String indentation = lineText.substring(0, lineText.length() - lineText.trim().length());
 
-                    String comment = indentation + "// TODO: Security API - " + annotation + "\n";
+                    String comment = indentation + "//&line [" + annotation + "]\n";
 
                     document.insertString(lineStartOffset, comment);
                 }
