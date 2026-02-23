@@ -166,7 +166,7 @@ public class MappingLocator {
         return false;
     }
 
-    private void addLineIfNotSeen(PsiElement element, Document document, Set<Integer> seenLines, 
+    private void addLineIfNotSeen(PsiElement element, Document document, Set<Integer> seenLines,
                                    List<Integer> lineNumbers, String fileName, MappingNode mappingNode) {
         int line = document.getLineNumber(element.getTextRange().getStartOffset()) + 1;
         if (seenLines.contains(line)) {
@@ -175,6 +175,8 @@ public class MappingLocator {
 
         seenLines.add(line);
         lineNumbers.add(line);
+        String matchedText = element.getText();
+        SecurityclassUtils.addMatchDetail(fileName, line, matchedText);
 
         for (String category : mappingNode.getCategories()) {
             Optional<SecurityClass> existingSecurityClass = SecurityclassUtils.getSecurityClasses()

@@ -6,7 +6,6 @@ import com.intellij.openapi.roots.ProjectRootManager;
 import com.intellij.psi.PsiElement;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.table.JBTable;
-import com.jetbrains.i.i.i.i.C.T;
 import data.MappingLoader;
 import data.MappingNode;
 import lombok.Getter;
@@ -134,7 +133,8 @@ public class ToolWindow implements ToolWindowFactory, DumbAware {
                     model.addRow(new Object[]{
                             securityClass.getName(),
                             fileName,
-                            lineNumber
+                            lineNumber,
+                            SecurityclassUtils.getMatchDetail(fileName, lineNumber)
                     });
                 }
             }
@@ -162,7 +162,7 @@ public class ToolWindow implements ToolWindowFactory, DumbAware {
 
 
     private JTable createTable(List<SecurityClass> data){
-        String[] columns = {"Securityclass","Filename","line/row"};
+        String[] columns = {"Securityclass","Filename","line/row","Matched"};
 
         DefaultTableModel model = new DefaultTableModel(columns,0){
             @Override
@@ -181,7 +181,8 @@ public class ToolWindow implements ToolWindowFactory, DumbAware {
             model.addRow(new Object[]{
                     securityClass.getName(),
                     securityClass.getOccurrences().keySet().stream().findFirst().get(),
-                    lineCount
+                    lineCount,
+                    ""
             });
         }
         JTable table = new JBTable(model);
@@ -198,6 +199,7 @@ public class ToolWindow implements ToolWindowFactory, DumbAware {
 
     private void findProjectFiles(Project project){
         VirtualFile[] roots = ProjectRootManager.getInstance(project).getContentSourceRoots();
+        System.out.println(Arrays.stream(roots).map(VirtualFile::toString));
         for(VirtualFile root : roots){
             traverseFiles(root);
         }

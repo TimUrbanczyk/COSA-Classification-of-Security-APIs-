@@ -82,6 +82,9 @@ public class ShowMethodPopupAction extends AnAction {
                 }
             }
             SecurityclassUtils.addSecurityClass(securityClass);
+            for (Integer line : lineNumbers) {
+                SecurityclassUtils.addMatchDetail(psiFile.getName(), line, methodQualifiedName != null ? methodQualifiedName : securityClassName);
+            }
 
             if (toolWindow != null) {
                 toolWindow.refreshTable();
