@@ -1,0 +1,25 @@
+{
+  "name": "Library/Framework Name",
+  "version": "Version Number",
+  "namespace": "Root Namespace",
+  "categories": [],
+  "children": [
+    {
+      "namespace": "Sub-Package/Module",
+      "categories": [],
+      "children": [
+        {
+          "namespace": "Class/Component Name",
+          "categories": ["Category1", "Category2"],
+          "children": [
+            {
+              "namespace": "Method/Function Name",
+              "categories": ["Category1", "Category2"],
+              "children": []
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
