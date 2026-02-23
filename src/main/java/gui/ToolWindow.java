@@ -56,6 +56,7 @@ public class ToolWindow implements ToolWindowFactory, DumbAware {
         JButton buttonAnnotateApis = new JButton("Annotate apis");
         JButton buttonSortByFile = new JButton("Sort by Filename");
         JButton buttonSortBySecurityClass = new JButton("Sort by SC name");
+        JButton buttonClearTable = new JButton("Clear Table");
         tableSecurityClasses = createTable(SecurityclassUtils.getSecurityClasses());
         addTableClickListener(project);
         
@@ -66,6 +67,13 @@ public class ToolWindow implements ToolWindowFactory, DumbAware {
         buttonPanel.add(buttonAnnotateApis);
         buttonPanel.add(buttonSortByFile);
         buttonPanel.add(buttonSortBySecurityClass);
+        buttonPanel.add(buttonClearTable);
+
+
+        buttonClearTable.addActionListener(e->{
+           DefaultTableModel tableModel = (DefaultTableModel) tableSecurityClasses.getModel();
+           tableModel.setRowCount(0);
+        });
 
         buttonMarkSecurityApisSingleFile.addActionListener(e->{
             List<MappingNode> allMappingNodes = new ArrayList<>();
