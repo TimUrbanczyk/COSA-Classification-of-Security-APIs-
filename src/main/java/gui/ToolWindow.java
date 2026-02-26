@@ -321,11 +321,6 @@ public class ToolWindow implements ToolWindowFactory, DumbAware {
                 addAnnotationsToFile(project, virtualFile, lineAnnotations);
             }
         }
-
-        JOptionPane.showMessageDialog(panel,
-                "Annotations added successfully!",
-                "Annotate APIs",
-                JOptionPane.INFORMATION_MESSAGE);
     }
 
     private void addAnnotationsToFile(Project project, VirtualFile virtualFile, Map<Integer, Set<String>> lineAnnotations) {
@@ -358,9 +353,10 @@ public class ToolWindow implements ToolWindowFactory, DumbAware {
 
                     String indentation = lineText.substring(0, lineText.length() - lineText.trim().length());
 
-                    String comment = indentation + "//&line [" + annotation + "]\n";
+                    int lineEndOffset = document.getLineEndOffset(lineNumber - 1);
+                    String comment = " //&line [" + annotation + "]";
 
-                    document.insertString(lineStartOffset, comment);
+                    document.insertString(lineEndOffset, comment);
                 }
             }
 
