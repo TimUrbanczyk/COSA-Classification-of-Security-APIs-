@@ -53,17 +53,5 @@ public class MappingLoader {
         return children;
     }
 
-    public void getNamespaces(MappingNode fileRootNode, ArrayList<String> namespaces){
-        if(fileRootNode.getNamespace() == null){
-            return;
-        }
-
-        namespaces.add(fileRootNode.getNamespace());
-
-        for(MappingNode childNode : fileRootNode.getChildren()){
-            getNamespaces(childNode, namespaces);
-        }
-
-    }
 }
 

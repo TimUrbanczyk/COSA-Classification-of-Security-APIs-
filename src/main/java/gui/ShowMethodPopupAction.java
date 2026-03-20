@@ -64,16 +64,17 @@ public class ShowMethodPopupAction extends AnAction {
             }
 
             HashMap<String, List<Integer>> occurences = new HashMap<>();
+            assert psiFile != null;
             occurences.put(psiFile.getName(), new ArrayList<>(lineNumbers));
             SecurityClass securityClass = new SecurityClass(securityClassName, occurences);
             for(SecurityClass sc : SecurityclassUtils.getSecurityClasses()){
-                if(securityClass.getName().equals(sc.getName())){
+                if(securityClass.name().equals(sc.name())){
                     for(Integer line : lineNumbers){
-                        if (!sc.getOccurrences().containsKey(psiFile.getName())) {
-                            sc.getOccurrences().put(psiFile.getName(), new ArrayList<>());
+                        if (!sc.occurrences().containsKey(psiFile.getName())) {
+                            sc.occurrences().put(psiFile.getName(), new ArrayList<>());
                         }
-                        if (!sc.getOccurrences().get(psiFile.getName()).contains(line)) {
-                            sc.getOccurrences().get(psiFile.getName()).add(line);
+                        if (!sc.occurrences().get(psiFile.getName()).contains(line)) {
+                            sc.occurrences().get(psiFile.getName()).add(line);
                         }
                     }
                     break;
@@ -84,9 +85,7 @@ public class ShowMethodPopupAction extends AnAction {
                 SecurityclassUtils.addMatchDetail(psiFile.getName(), line, methodQualifiedName != null ? methodQualifiedName : securityClassName);
             }
 
-            if (toolWindow != null) {
-                toolWindow.refreshTable();
-            }
+            toolWindow.refreshTable();
         }
 
     }

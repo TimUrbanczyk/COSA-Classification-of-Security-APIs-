@@ -5,6 +5,8 @@ import SecurityClass.SecurityclassUtils;
 import com.intellij.openapi.editor.Document;
 import com.intellij.psi.*;
 import data.MappingNode;
+import org.jetbrains.annotations.NotNull;
+
 import java.util.*;
 
 public class MappingLocator {
@@ -14,7 +16,7 @@ public class MappingLocator {
         Set<Integer> seenLines = new HashSet<>();
 
         PsiFile psiFile = fileAsPsiElement.getContainingFile();
-        if (psiFile == null || !(psiFile instanceof PsiJavaFile)) {
+        if (!(psiFile instanceof PsiJavaFile)) {
             return;
         }
 
@@ -38,23 +40,22 @@ public class MappingLocator {
         final Document finalDocument = document;
         final String fileName = psiFile.getName();
 
-        ((PsiJavaFile) psiFile).accept(new JavaRecursiveElementVisitor() {
+        psiFile.accept(new JavaRecursiveElementVisitor() {
             @Override
-            public void visitReferenceElement(PsiJavaCodeReferenceElement reference) {
+            public void visitReferenceElement(@NotNull PsiJavaCodeReferenceElement reference) {
                 super.visitReferenceElement(reference);
                 
                 PsiElement resolved = reference.resolve();
-                if (resolved instanceof PsiClass) {
-                    PsiClass psiClass = (PsiClass) resolved;
+                if (resolved instanceof PsiClass psiClass) {
                     String qualifiedName = psiClass.getQualifiedName();
-                    if (qualifiedName != null && matchesNamespace(qualifiedName, targetNamespace)) {
+                    if (matchesNamespace(qualifiedName, targetNamespace)) {
                         addLineIfNotSeen(reference, finalDocument, finalSeenLines, finalLineNumbers, fileName, mappingNode);
                     }
                 }
             }
 
             @Override
-            public void visitMethodCallExpression(PsiMethodCallExpression expression) {
+            public void visitMethodCallExpression(@NotNull PsiMethodCallExpression expression) {
                 super.visitMethodCallExpression(expression);
                 
                 PsiMethod method = expression.resolveMethod();
@@ -62,7 +63,7 @@ public class MappingLocator {
                     PsiClass containingClass = method.getContainingClass();
                     if (containingClass != null) {
                         String qualifiedName = containingClass.getQualifiedName();
-                        if (qualifiedName != null && matchesNamespace(qualifiedName, targetNamespace)) {
+                        if (matchesNamespace(qualifiedName, targetNamespace)) {
                             addLineIfNotSeen(expression, finalDocument, finalSeenLines, finalLineNumbers, fileName, mappingNode);
                         }
                     }
@@ -70,12 +71,12 @@ public class MappingLocator {
             }
 
             @Override
-            public void visitImportStatement(PsiImportStatement statement) {
+            public void visitImportStatement(@NotNull PsiImportStatement statement) {
                 super.visitImportStatement(statement);
                 
                 if (statement.isOnDemand()) {
                     String importQualifiedName = statement.getQualifiedName();
-                    if (importQualifiedName != null && matchesNamespace(importQualifiedName, targetNamespace)) {
+                    if (matchesNamespace(importQualifiedName, targetNamespace)) {
                         addLineIfNotSeen(statement, finalDocument, finalSeenLines, finalLineNumbers, fileName, mappingNode);
                     }
                 } else {
@@ -100,17 +101,16 @@ public class MappingLocator {
 
             // Skip comments and string literals
             @Override
-            public void visitComment(PsiComment comment) {
+            public void visitComment(@NotNull PsiComment comment) {
                 // Skip comments
             }
 
             @Override
-            public void visitLiteralExpression(PsiLiteralExpression expression) {
+            public void visitLiteralExpression(@NotNull PsiLiteralExpression expression) {
                 // Skip string literals
             }
         });
 
-        return;
     }
 
     private String buildFullNamespace(MappingNode mappingNode) {
@@ -178,11 +178,11 @@ public class MappingLocator {
         for (String category : mappingNode.getCategories()) {
             Optional<SecurityClass> existingSecurityClass = SecurityclassUtils.getSecurityClasses()
                     .stream()
-                    .filter(existing -> Objects.equals(existing.getName(), category))
+                    .filter(existing -> Objects.equals(existing.name(), category))
                     .findFirst();
 
             if(existingSecurityClass.isPresent()){
-                List<Integer> fileLines = existingSecurityClass.get().occurrences
+                List<Integer> fileLines = existingSecurityClass.get().occurrences()
                         .computeIfAbsent(fileName, k -> new ArrayList<>());
                 // Only add if line doesn't already exist to prevent duplicates
                 if (!fileLines.contains(line)) {
@@ -192,7 +192,7 @@ public class MappingLocator {
                 SecurityClass securityClass =
                         new SecurityClass(category, new HashMap<>());
 
-                securityClass.occurrences
+                securityClass.occurrences()
                         .computeIfAbsent(fileName, k -> new ArrayList<>())
                         .add(line);
 

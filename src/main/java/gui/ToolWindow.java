@@ -9,6 +9,7 @@ import com.intellij.ui.table.JBTable;
 import data.MappingLoader;
 import data.MappingNode;
 import lombok.Getter;
+import org.jetbrains.annotations.NotNull;
 import psi.PsiUtils;
 import scanner.MappingLocator;
 import com.intellij.openapi.project.DumbAware;
@@ -48,7 +49,7 @@ public class ToolWindow implements ToolWindowFactory, DumbAware {
     private static ToolWindow instance;
 
     @Override
-    public void createToolWindowContent(Project project, com.intellij.openapi.wm.ToolWindow toolwindow) {
+    public void createToolWindowContent(@NotNull Project project, com.intellij.openapi.wm.@NotNull ToolWindow toolwindow) {
 
         ToolWindow.instance = this;
         panel = new JPanel();
@@ -110,7 +111,7 @@ public class ToolWindow implements ToolWindowFactory, DumbAware {
 
             refreshTable();
             if (currentDialog != null) {
-                currentDialog.refresh();
+                ClassificationPopUp.refresh();
             }
 
             
@@ -135,23 +136,17 @@ public class ToolWindow implements ToolWindowFactory, DumbAware {
 
             refreshTable();
             if (currentDialog != null) {
-                currentDialog.refresh();
+                ClassificationPopUp.refresh();
             }
 
 
         });
 
-        buttonAnnotateApis.addActionListener(e -> {
-            annotateSecurityApis(project);
-        });
+        buttonAnnotateApis.addActionListener(e -> annotateSecurityApis(project));
 
-        buttonSortByFile.addActionListener(e ->{
-            sortTableByColumn(1);
-        });
+        buttonSortByFile.addActionListener(e -> sortTableByColumn(1));
 
-        buttonSortBySecurityClass.addActionListener(e ->{
-            sortTableByColumn(0);
-        });
+        buttonSortBySecurityClass.addActionListener(e -> sortTableByColumn(0));
 
         panel.add(buttonPanel);
         JScrollPane tableScrollPane = new JBScrollPane(tableSecurityClasses);
@@ -169,11 +164,11 @@ public class ToolWindow implements ToolWindowFactory, DumbAware {
         DefaultTableModel model = (DefaultTableModel) tableSecurityClasses.getModel();
         model.setRowCount(0);
         for(SecurityClass securityClass : SecurityclassUtils.getSecurityClasses()){
-            for(Map.Entry<String, List<Integer>> entry : securityClass.getOccurrences().entrySet()){
+            for(Map.Entry<String, List<Integer>> entry : securityClass.occurrences().entrySet()){
                 String fileName = entry.getKey();
                 for(Integer lineNumber : entry.getValue()){
                     model.addRow(new Object[]{
-                            securityClass.getName(),
+                            securityClass.name(),
                             fileName,
                             lineNumber,
                             SecurityclassUtils.getMatchDetail(fileName, lineNumber)
@@ -198,7 +193,7 @@ public class ToolWindow implements ToolWindowFactory, DumbAware {
     public void setCurrentDialog(ClassificationPopUp dialog) {
         this.currentDialog = dialog;
         if (currentDialog != null) {
-            currentDialog.refresh();
+            ClassificationPopUp.refresh();
         }
     }
 
@@ -214,15 +209,15 @@ public class ToolWindow implements ToolWindowFactory, DumbAware {
         };
 
         for(SecurityClass securityClass : data){
-            int lineCount = securityClass.getOccurrences()
+            int lineCount = securityClass.occurrences()
                     .values()
                     .stream()
                     .mapToInt(List::size)
                     .sum();
 
             model.addRow(new Object[]{
-                    securityClass.getName(),
-                    securityClass.getOccurrences().keySet().stream().findFirst().get(),
+                    securityClass.name(),
+                    securityClass.occurrences().keySet().stream().findFirst().get(),
                     lineCount,
                     ""
             });
@@ -310,13 +305,13 @@ public class ToolWindow implements ToolWindowFactory, DumbAware {
         Map<String, Map<Integer, Set<String>>> fileAnnotations = new HashMap<>();
 
         for (SecurityClass securityClass : SecurityclassUtils.getSecurityClasses()) {
-            for (Map.Entry<String, List<Integer>> entry : securityClass.getOccurrences().entrySet()) {
+            for (Map.Entry<String, List<Integer>> entry : securityClass.occurrences().entrySet()) {
                 String fileName = entry.getKey();
                 fileAnnotations.putIfAbsent(fileName, new HashMap<>());
 
                 for (Integer lineNumber : entry.getValue()) {
                     fileAnnotations.get(fileName).putIfAbsent(lineNumber, new HashSet<>());
-                    fileAnnotations.get(fileName).get(lineNumber).add(securityClass.getName());
+                    fileAnnotations.get(fileName).get(lineNumber).add(securityClass.name());
                 }
             }
         }
@@ -351,14 +346,6 @@ public class ToolWindow implements ToolWindowFactory, DumbAware {
                 if (lineNumber > 0 && lineNumber <= document.getLineCount()) {
                     Set<String> securityClasses = lineAnnotations.get(lineNumber);
                     String annotation = String.join(", ", securityClasses);
-
-                    int lineStartOffset = document.getLineStartOffset(lineNumber - 1);
-                    String lineText = document.getText(
-                            new com.intellij.openapi.util.TextRange(
-                                    lineStartOffset,
-                                    document.getLineEndOffset(lineNumber - 1)
-                            )
-                    );
 
                     int lineEndOffset = document.getLineEndOffset(lineNumber - 1);
                     String comment = " //&line [" + annotation + "]";

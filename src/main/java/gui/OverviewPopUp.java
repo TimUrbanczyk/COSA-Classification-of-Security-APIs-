@@ -57,15 +57,15 @@ public class OverviewPopUp extends JDialog {
 
         Map<String, Set<String>> classToFiles = new LinkedHashMap<>();
         for (SecurityClass sc : securityClasses) {
-            classToFiles.put(sc.getName(), sc.getOccurrences().keySet());
+            classToFiles.put(sc.name(), sc.occurrences().keySet());
         }
 
         for (SecurityClass sc : securityClasses) {
-            String name = sc.getName();
-            int loc = sc.getOccurrences().values().stream().mapToInt(List::size).sum();
-            int scattering = sc.getOccurrences().size();
+            String name = sc.name();
+            int loc = sc.occurrences().values().stream().mapToInt(List::size).sum();
+            int scattering = sc.occurrences().size();
 
-            Set<String> ownFiles = sc.getOccurrences().keySet();
+            Set<String> ownFiles = sc.occurrences().keySet();
             long tangling = classToFiles.entrySet().stream()
                     .filter(e -> !e.getKey().equals(name))
                     .filter(e -> e.getValue().stream().anyMatch(ownFiles::contains))
