@@ -4,6 +4,16 @@
 [![Version](https://img.shields.io/jetbrains/plugin/v/MARKETPLACE_ID.svg)](https://plugins.jetbrains.com/plugin/MARKETPLACE_ID)
 [![Downloads](https://img.shields.io/jetbrains/plugin/d/MARKETPLACE_ID.svg)](https://plugins.jetbrains.com/plugin/MARKETPLACE_ID)
 
+---
+
+## Demo Video
+
+[![Watch the COSA Plugin Demo](https://img.youtube.com/vi/6kRbPF3yuJg/0.jpg)](https://youtu.be/6kRbPF3yuJg)
+
+See the plugin in action! Click the thumbnail to watch the video on YouTube.
+
+---
+
 An IntelliJ IDEA plugin that scans Java projects for usages of well-known security libraries, classifies every match into a security category, and surfaces code-quality metrics directly inside the IDE.
 
 <!-- Plugin description -->
@@ -51,8 +61,6 @@ COSA (Classification of Security APIs) detects and classifies security-related A
 | javax.mail | `javax-mail.json` |
 
 ---
-
-
 
 ## Usage
 
@@ -119,39 +127,3 @@ Create a JSON file in `src/main/resources/lib-mappings/` following the existing 
     }
   ]
 }
-```
-
-The plugin loads all JSON files from that directory automatically on startup.
-
----
-
-## Project Structure
-
-```
-src/main/java/
-  gui/                  # Tool window, pop-ups, and actions
-  scanner/              # PSI-based API locator (MappingLocator)
-  data/                 # JSON loader and MappingNode model
-  SecurityClass/        # SecurityClass model and SecurityclassUtils registry
-  psi/                  # PSI helper utilities
-src/main/resources/
-  lib-mappings/         # JSON library-to-category mapping files
-  META-INF/plugin.xml   # Plugin descriptor
-```
-
----
-
-## Tech Stack
-
-- **Language:** Java 17
-- **Build:** Gradle with IntelliJ Platform Gradle Plugin
-- **UI:** IntelliJ Platform Swing components (`JBTable`, `JBScrollPane`)
-- **PSI:** IntelliJ Program Structure Interface for AST traversal
-- **Mapping format:** JSON via Jackson Databind
-- **Boilerplate reduction:** Lombok
-
----
-
-Plugin based on the [IntelliJ Platform Plugin Template][template].
-
-[template]: https://github.com/JetBrains/intellij-platform-plugin-template
