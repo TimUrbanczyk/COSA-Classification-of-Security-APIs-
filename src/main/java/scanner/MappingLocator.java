@@ -4,35 +4,32 @@ import SecurityClass.SecurityClass;
 import SecurityClass.SecurityclassUtils;
 import com.intellij.openapi.editor.Document;
 import com.intellij.psi.*;
-import com.intellij.psi.PsiDocumentManager;
-import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiFile;
 import data.MappingNode;
 import java.util.*;
 
 public class MappingLocator {
 
-    public List<Integer> locateMapping(MappingNode mappingNode, PsiElement fileAsPsiElement) {
+    public void locateMapping(MappingNode mappingNode, PsiElement fileAsPsiElement) {
         List<Integer> lineNumbers = new ArrayList<>();
         Set<Integer> seenLines = new HashSet<>();
 
         PsiFile psiFile = fileAsPsiElement.getContainingFile();
         if (psiFile == null || !(psiFile instanceof PsiJavaFile)) {
-            return lineNumbers;
+            return;
         }
 
         PsiDocumentManager manager = PsiDocumentManager.getInstance(psiFile.getProject());
         Document document = manager.getDocument(psiFile);
 
         if (document == null){
-            return lineNumbers;
+            return;
         }
 
         manager.commitDocument(document);
 
         String fullNamespace = buildFullNamespace(mappingNode);
         if (fullNamespace == null || fullNamespace.isEmpty()){
-            return lineNumbers;
+            return;
         }
 
         final String targetNamespace = fullNamespace.toLowerCase();
@@ -113,7 +110,7 @@ public class MappingLocator {
             }
         });
 
-        return lineNumbers;
+        return;
     }
 
     private String buildFullNamespace(MappingNode mappingNode) {

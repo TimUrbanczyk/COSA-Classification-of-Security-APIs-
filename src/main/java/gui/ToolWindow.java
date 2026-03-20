@@ -38,7 +38,7 @@ public class ToolWindow implements ToolWindowFactory, DumbAware {
     private final MappingLocator mappingLocator = new MappingLocator();
     private ClassificationPopUp currentDialog;
     private JTable tableSecurityClasses;
-    private List<VirtualFile> projectFiles = new ArrayList<>();
+    private final List<VirtualFile> projectFiles = new ArrayList<>();
     private Integer currentSortColumn = null;
 
     @Getter
@@ -359,8 +359,6 @@ public class ToolWindow implements ToolWindowFactory, DumbAware {
                                     document.getLineEndOffset(lineNumber - 1)
                             )
                     );
-
-                    String indentation = lineText.substring(0, lineText.length() - lineText.trim().length());
 
                     int lineEndOffset = document.getLineEndOffset(lineNumber - 1);
                     String comment = " //&line [" + annotation + "]";

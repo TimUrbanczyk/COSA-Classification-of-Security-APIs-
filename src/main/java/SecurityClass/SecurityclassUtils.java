@@ -10,10 +10,10 @@ import java.util.Map;
 public class SecurityclassUtils {
 
     @Getter
-    private static List<SecurityClass> securityClasses = new ArrayList<>();
+    private final static List<SecurityClass> securityClasses = new ArrayList<>();
 
     @Getter
-    private static Map<String, Map<Integer, String>> matchDetails = new HashMap<>();
+    private final static Map<String, Map<Integer, String>> matchDetails = new HashMap<>();
 
     public static void addSecurityClass(SecurityClass securityClass){
         securityClasses.add(securityClass);
