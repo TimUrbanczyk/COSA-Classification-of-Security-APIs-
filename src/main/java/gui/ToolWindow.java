@@ -32,6 +32,10 @@ import com.intellij.openapi.editor.Document;
 import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiFile;
 
+/**
+ * Main tool window factory for the COSA plugin.
+ * Handles UI initialization and coordination of security API scanning.
+ */
 public class ToolWindow implements ToolWindowFactory, DumbAware {
 
     private final MappingLoader mappingLoader = new MappingLoader();
@@ -42,12 +46,24 @@ public class ToolWindow implements ToolWindowFactory, DumbAware {
     private final List<VirtualFile> projectFiles = new ArrayList<>();
     private Integer currentSortColumn = null;
 
+    /**
+     * The main panel of the tool window.
+     */
     @Getter
     private JPanel panel;
 
+    /**
+     * Singleton instance of the tool window.
+     */
     @Getter
     private static ToolWindow instance;
 
+    /**
+     * Creates the content for the tool window.
+     *
+     * @param project    the current project
+     * @param toolwindow the tool window being created
+     */
     @Override
     public void createToolWindowContent(@NotNull Project project, com.intellij.openapi.wm.@NotNull ToolWindow toolwindow) {
 

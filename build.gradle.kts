@@ -132,6 +132,18 @@ kover {
 }
 
 tasks {
+    withType<JavaCompile> {
+        sourceCompatibility = "17"
+        targetCompatibility = "17"
+    }
+
+    withType<Javadoc> {
+        options {
+            (this as StandardJavadocDocletOptions).addStringOption("Xdoclint:none", "-quiet")
+            encoding = "UTF-8"
+        }
+    }
+
     wrapper {
         gradleVersion = providers.gradleProperty("gradleVersion").get()
     }

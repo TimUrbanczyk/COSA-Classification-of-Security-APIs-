@@ -11,10 +11,16 @@ import java.awt.*;
 
 import java.util.List;
 
+/**
+ * Dialog for classifying a security API usage.
+ */
 public class ClassificationPopUp extends DialogWrapper {
     private static List<SecurityClass> securityclasses = SecurityclassUtils.getSecurityClasses();
     private JTextField textField;
 
+    /**
+     * Constructs a new ClassificationPopUp.
+     */
     public ClassificationPopUp(){
         super(true);
         setTitle("Classify API- COSA");
@@ -42,6 +48,11 @@ public class ClassificationPopUp extends DialogWrapper {
         return panel;
     }
 
+    /**
+     * Returns the value entered in the classification text field.
+     *
+     * @return the text field content
+     */
     public String getTextFieldValue(){
         return textField.getText();
     }
@@ -52,6 +63,9 @@ public class ClassificationPopUp extends DialogWrapper {
 
     }
 
+    /**
+     * Refreshes the internal list of security classes from the global utility.
+     */
     public static void refresh(){
         syncSecurityclasses();
     }

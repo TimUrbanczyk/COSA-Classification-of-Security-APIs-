@@ -10,10 +10,18 @@ import java.awt.*;
 import java.util.*;
 import java.util.List;
 
+/**
+ * A dialog providing an overview of all identified security classes and their metrics.
+ */
 public class OverviewPopUp extends JDialog {
 
     private final JTable overviewTable;
 
+    /**
+     * Constructs an OverviewPopUp.
+     *
+     * @param parent the parent component for positioning
+     */
     public OverviewPopUp(Component parent) {
         super(SwingUtilities.getWindowAncestor(parent), "Security Class Overview", ModalityType.MODELESS);
         setLayout(new BorderLayout());
@@ -45,6 +53,9 @@ public class OverviewPopUp extends JDialog {
         setLocationRelativeTo(parent);
     }
 
+    /**
+     * Refreshes the data displayed in the overview table.
+     */
     public void refresh() {
         DefaultTableModel model = (DefaultTableModel) overviewTable.getModel();
         model.setRowCount(0);

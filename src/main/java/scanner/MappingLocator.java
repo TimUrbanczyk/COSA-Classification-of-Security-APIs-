@@ -9,8 +9,17 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
+/**
+ * Locator class that scans Java source files for security API usages based on mapping definitions.
+ */
 public class MappingLocator {
 
+    /**
+     * Scans a PSI element (representing a file) for occurrences of a given mapping node.
+     *
+     * @param mappingNode       the security mapping to look for
+     * @param fileAsPsiElement the root PSI element of the file to scan
+     */
     public void locateMapping(MappingNode mappingNode, PsiElement fileAsPsiElement) {
         List<Integer> lineNumbers = new ArrayList<>();
         Set<Integer> seenLines = new HashSet<>();

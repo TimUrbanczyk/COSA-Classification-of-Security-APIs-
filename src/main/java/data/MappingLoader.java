@@ -6,11 +6,19 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Loader class for reading security mapping definitions from resources.
+ */
 public class MappingLoader {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final String userHome = System.getProperty("user.home");
 
+    /**
+     * Loads all parent mappings from the local resources directory.
+     *
+     * @return a list of top-level {@link MappingNode}s
+     */
     public List<MappingNode> loadAllParentMappings(){
 
         List<MappingNode> allMappings = new ArrayList<>();
@@ -40,6 +48,13 @@ public class MappingLoader {
         return allMappings;
     }
 
+    /**
+     * Recursively retrieves all child mappings for a given node.
+     *
+     * @param mappingNode the root node to start from
+     * @param children    the list to accumulate children into
+     * @return the list containing all descendant mapping nodes
+     */
     public List<MappingNode> getAllChildMappings(MappingNode mappingNode, ArrayList<MappingNode> children){
         if(mappingNode.getChildren() == null || mappingNode.getChildren().isEmpty()){
             return children;

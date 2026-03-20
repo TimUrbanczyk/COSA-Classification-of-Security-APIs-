@@ -17,7 +17,15 @@ import java.util.HashMap;
 import java.util.List;
 
 
+/**
+ * Action that shows a popup for classifying a method call under a security class.
+ */
 public class ShowMethodPopupAction extends AnAction {
+    /**
+     * Performs the action: identifies the method at the caret and opens the classification dialog.
+     *
+     * @param e the action event
+     */
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
         if(e.getProject() == null) {
