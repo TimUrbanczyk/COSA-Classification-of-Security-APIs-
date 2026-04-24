@@ -1,9 +1,5 @@
 # COSA – Classification of Security APIs
 
-![Build](https://github.com/TimUrbanczyk/COSA-Classification-of-Security-APIs-/workflows/Build/badge.svg)
-[![Version](https://img.shields.io/jetbrains/plugin/v/MARKETPLACE_ID.svg)](https://plugins.jetbrains.com/plugin/MARKETPLACE_ID)
-[![Downloads](https://img.shields.io/jetbrains/plugin/d/MARKETPLACE_ID.svg)](https://plugins.jetbrains.com/plugin/MARKETPLACE_ID)
-
 ---
 
 ## Demo Video
